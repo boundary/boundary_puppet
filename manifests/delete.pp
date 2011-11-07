@@ -32,7 +32,7 @@ class bprobe::delete {
   }
 
   file { '/etc/bprobe/':
-    ensure => absent,
+    ensure  => absent,
     recurse => true,
   }
 

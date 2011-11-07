@@ -61,8 +61,8 @@ class bprobe::dependencies {
         refreshonly => true,
       }
 
-      package { "apt-transport-https":
-          ensure => latest,
+      package { 'apt-transport-https':
+        ensure => latest,
       }
 
       file { '/etc/apt/sources.list.d/boundary.list':
