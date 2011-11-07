@@ -1,7 +1,8 @@
 #
 # Author:: Jomes Turnbull <james@puppetlabs.com>
-# Cookbook Name:: bprobe
-# Provider:: default
+# Boundary API and code heavily stolen from Joe Williams (<j@boundary.com>)
+# Type Name:: boundary_meter
+# Provider:: boundary_meter
 #
 # Copyright 2011, Puppet Labs
 #
