@@ -12,7 +12,7 @@ class (manifests/params.pp).
 
 To remove a meter change your include to:
 
-  include bprobe::delete
+    include bprobe::delete
 
 Author
 ---
