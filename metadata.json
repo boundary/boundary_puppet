@@ -1,0 +1,68 @@
+{
+  "description": "A module to install Boundary metrics meters.",
+  "summary": "Boundary meter module",
+  "source": "UNKNOWN",
+  "author": "puppetlabs",
+  "types": [
+    {
+      "providers": [
+        {
+          "doc": "Manage Boundary meters.    Default for `kernel` == `Linux`.  ",
+          "name": "boundary_meter"
+        },
+        {
+          "doc": "This is a default provider that does nothing. This allows us to install the Boundary meter on the same puppet run where we want to use it.    ",
+          "name": "default"
+        }
+      ],
+      "properties": [
+        {
+          "doc": "The basic property that the resource should be in.  Valid values are `present`, `absent`.",
+          "name": "ensure"
+        }
+      ],
+      "doc": "Manage creation/deletion of Boundary meters.",
+      "name": "boundary_meter",
+      "parameters": [
+        {
+          "doc": "The Boundary meter name",
+          "name": "meter"
+        },
+        {
+          "doc": "The Boundary user name.",
+          "name": "username"
+        },
+        {
+          "doc": "The Boundary API key.",
+          "name": "apikey"
+        }
+      ]
+    }
+  ],
+  "project_page": "https://github.com/puppetlabs/puppetlabs-boundary",
+  "license": "Apache 2.0",
+  "checksums": {
+    "manifests/params.pp": "87c11cc13f221bcd38440ae255996c4c",
+    "lib/puppet/provider/boundary_meter/default.rb": "c3ad695c30d6f000025d0639838812cf",
+    "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909",
+    "templates/bprobe.defaults.erb": "16b74eb09c45309f6cddf866aaafa16f",
+    "files/ca.pem": "11f809a92ed1cc029c3ac86b42460a10",
+    "README.md": "93e82bb826da01133f185e46bc779daa",
+    "manifests/dependencies.pp": "d6d973962f080355bdae327ccde92c72",
+    "lib/puppet/type/boundary_meter.rb": "3527d47ed4649b5e5e44d0855809b8b6",
+    "files/RPM-GPG-KEY-Boundary": "ccb5778396a8d6d6fee68f7e540134fc",
+    "tests/init.pp": "3198e7a59d5b8855e549ed5b35dcbf88",
+    "manifests/delete.rb": "c94f907a7813cb7ba62703a6c4dc0c2e",
+    "lib/puppet/provider/boundary_meter/boundary_meter.rb": "e9a435164c21150913a9f7ae4c0cc307",
+    "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
+    "templates/apt_source.erb": "ce710eeb7caf86da3fb27390ee0cd431",
+    "metadata.json": "d34d0b70aba36510fbc2df4e667479ef",
+    "manifests/init.pp": "6ff416d3fd3dfa3a53b91bd678327660",
+    "Modulefile": "0c09bef86452ee2d95976fcc982ffae8"
+  },
+  "version": "0.0.1",
+  "name": "puppetlabs-bprobe",
+  "dependencies": [
+
+  ]
+}
