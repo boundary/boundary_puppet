@@ -19,6 +19,8 @@ Author
 
 James Turnbull <james@puppetlabs.com>
 
+The boundary_node type and provider is heavily based on work by Joe Williams and Ben Black from Boundary.
+
 Copyright
 ---
 
