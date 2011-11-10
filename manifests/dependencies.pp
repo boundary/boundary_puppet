@@ -49,15 +49,9 @@ class bprobe::dependencies {
 
     'debian', 'ubuntu': {
 
-      file { '/tmp/APT-GPG-KEY-Boundary':
-        ensure => present,
-        source => 'puppet:///modules/bprobe/APT-GPG-KEY-Boundary',
-        notify => Exec['add-key'],
-      }
-
       exec { 'add-key':
-        command     => '/usr/bin/apt-key add /tmp/APT-GPG-KEY-Boundary',
-        require     => File['/tmp/APT-GPG-KEY-Boundary'],
+        command     => '/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 6532CC20 && apt-get update',
+        unless      => "apt-key list | grep -qF '6532CC20'",
         refreshonly => true,
       }
 
