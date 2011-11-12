@@ -29,31 +29,69 @@ module Boundary
 
     API_HOST = "api.boundary.com"
 
-    def auth_encode(resource, username, apikey)
-      auth = Base64.encode64("#{username}:#{apikey}").strip
+    def auth_encode(resource)
+      auth = Base64.encode64("#{resource[:username]}:#{resource[:apikey]}").strip
       auth.gsub("\n","")
     end
 
-    def build_url(resource, username, apikey, action)
+    def generate_headers(resource)
+      auth = auth_encode(resource)
+      { "Authorization" => "Basic #{auth}", "Content-Type" => "application/json" }
+    end
+
+    def build_url(resource, action)
       case action
       when :create
         "https://#{API_HOST}/meters"
       when :search
-        "https://#{API_HOST}/meters?name=#{resource}"
+        "https://#{API_HOST}/meters?name=#{resource[:name]}"
       when :certificates
-        meter_id = get_meter_id(resource, username, apikey)
+        meter_id = get_meter_id(resource)
         "https://#{API_HOST}/meters/#{meter_id}"
+      when :tags
+        meter_id = get_meter_id(resource)
+        "https://#{API_HOST}/meters/#{meter_id}/tags"
       when :delete
-        meter_id = get_meter_id(resource, username, apikey)
+        meter_id = get_meter_id(resource)
         "https://#{API_HOST}/meters/#{meter_id}"
       end
     end
 
-    def meter_exists?(resource, username, apikey)
+    def create_meter(resource)
       begin
-        url = build_url(resource, username, apikey, :search)
-        auth = auth_encode(resource, username, apikey)
-        headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
+        url = build_url(resource, :create)
+        headers = generate_headers(resource)
+        body = {:name => resource[:name]}.to_json
+
+        Puppet.info("Creating meter #{resource[:name]}")
+        response = http_post_request(url, headers, body)
+
+        download_certificate_request(resource)
+        download_key_request(resource)
+        if resource[:tags]
+          apply_meter_tags(resource)
+        end
+      rescue Exception => e
+          raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+      end
+    end
+
+    def delete_meter(resource)
+      begin
+        url = build_url(resource, :delete)
+        headers = generate_headers(resource)
+
+        Puppet.info("Deleting meter #{resource[:name]}")
+        response = http_delete_request(url, headers)
+      rescue Exception => e
+        raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+      end
+    end
+
+    def meter_exists?(resource)
+      begin
+        url = build_url(resource, :search)
+        headers = generate_headers(resource)
 
         response = http_get_request(url, headers)
 
@@ -75,11 +113,10 @@ module Boundary
       end
     end
 
-    def get_meter_id(resource, username, apikey)
+    def get_meter_id(resource)
       begin
-        url = build_url(resource, username, apikey, :search)
-        auth = auth_encode(resource, username, apikey)
-        headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
+        url = build_url(resource, :search)
+        headers = generate_headers(resource)
 
         response = http_get_request(url, headers)
 
@@ -97,11 +134,10 @@ module Boundary
       end
     end
 
-    def download_certificate_request(resource, username, apikey)
+    def download_certificate_request(resource)
       begin
-        auth = auth_encode(resource, username, apikey)
-        base_url = build_url(resource, username, apikey, :certificates)
-        headers = {"Authorization" => "Basic #{auth}"}
+        base_url = build_url(resource, :certificates)
+        headers = generate_headers(resource)
 
         cert_response = http_get_request("#{base_url}/cert.pem", headers)
 
@@ -118,11 +154,10 @@ module Boundary
       end
     end
 
-    def download_key_request(resource, username, apikey)
+    def download_key_request(resource)
       begin
-        auth = auth_encode(resource, username, apikey)
-        base_url = build_url(resource, username, apikey, :certificates)
-        headers = {"Authorization" => "Basic #{auth}"}
+        base_url = build_url(resource, :certificates)
+        headers = generate_headers(resource)
 
         key_response = http_get_request("#{base_url}/key.pem", headers)
 
@@ -136,6 +171,23 @@ module Boundary
         end
       rescue Exception => e
         raise Puppet::Error, "Could not download key, failed with #{e}"
+      end
+    end
+
+    def apply_meter_tags(resource)
+      tags = resource[:tags]
+
+      begin
+        url = build_url(resource, :tags)
+        headers = generate_headers(resource)
+
+        Puppet.info("Applying meter tags #{tags.inspect}")
+
+        tags.each do |tag|
+          http_put_request("#{url}/#{tag}", headers, "")
+        end
+      rescue Exception => e
+          raise Puppet::Error, "Could not apply meter tag, failed with #{e}"
       end
     end
 
@@ -165,6 +217,22 @@ module Boundary
       Puppet.debug("Status: #{response.status}")
 
       if bad_response?(:delete, url, response)
+        nil
+      else
+        response
+      end
+    end
+
+    def http_put_request(url, headers, body)
+      Puppet.debug("Url: #{url}")
+      Puppet.debug("Headers: #{headers}")
+
+      response = Excon.put(url, :headers => headers, :body => body)
+
+      Puppet.debug("Body: #{response.body}")
+      Puppet.debug("Status: #{response.status}")
+
+      if bad_response?(:put, url, response)
         nil
       else
         response
@@ -208,35 +276,19 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
 
   def create
     begin
-      url = build_url(resource[:name], resource[:username], resource[:apikey], :create)
-      auth = auth_encode(resource[:name], resource[:username], resource[:apikey])
-      headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
-      body = {:name => resource[:name]}.to_json
-
-      Puppet.info("Creating meter #{resource[:name]}")
-      response = http_post_request(url, headers, body)
-
-      download_certificate_request(resource[:name], resource[:username], resource[:apikey])
-      download_key_request(resource[:name], resource[:username], resource[:apikey])
-
+      create_meter(resource)
     rescue Exception => e
       raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
     end
   end
 
   def exists?
-    meter_exists?(resource[:name], resource[:username], resource[:apikey])
+    meter_exists?(resource)
   end
 
   def destroy
     begin
-      url = build_url(resource[:name], resource[:username], resource[:apikey], :delete)
-      auth = auth_encode(resource[:name], resource[:username], resource[:apikey])
-      headers = {"Authorization" => "Basic #{auth}"}
-
-      Puppet.info("Deleting meter #{resource[:name]}")
-      response = http_delete_request(url, headers)
-
+      delete_meter(resource)
     rescue Exception => e
       raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
     end

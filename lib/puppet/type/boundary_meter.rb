@@ -5,7 +5,7 @@ Puppet::Type.newtype(:boundary_meter) do
   ensurable
 
   newparam(:meter, :namevar => true) do
-    desc "The Boundary meter name"
+    desc "The Boundary meter name."
   end
 
   newparam(:username) do
@@ -14,5 +14,9 @@ Puppet::Type.newtype(:boundary_meter) do
 
   newparam(:apikey) do
     desc "The Boundary API key."
+  end
+
+  newparam(:tags) do
+    desc "Tags to be added to the Boundary meter. Specify a tag or an array of tags."
   end
 end
