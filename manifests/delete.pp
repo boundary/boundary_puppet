@@ -34,6 +34,7 @@ class bprobe::delete {
   file { '/etc/bprobe/':
     ensure  => absent,
     recurse => true,
+    force   => true,
   }
 
   service { 'bprobe':
