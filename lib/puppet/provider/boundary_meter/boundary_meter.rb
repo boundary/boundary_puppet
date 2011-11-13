@@ -84,7 +84,7 @@ module Boundary
         Puppet.info("Deleting meter #{resource[:name]}")
         response = http_delete_request(url, headers)
       rescue Exception => e
-        raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
       end
     end
 
