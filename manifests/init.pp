@@ -22,14 +22,14 @@ class bprobe {
   require bprobe::params
   require bprobe::dependencies
 
-  $username       = $bprobe::params::username
+  $id             = $bprobe::params::id
   $apikey         = $bprobe::params::apikey
   $collector      = $bprobe::params::collector
   $collector_port = $bprobe::params::collector_port
 
   boundary_meter { $fqdn:
     ensure   => present,
-    username => $username,
+    id       => $id,
     apikey   => $apikey,
   }
 

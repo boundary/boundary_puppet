@@ -20,8 +20,8 @@
 
 class bprobe::params {
 
-  $username       = 'user@example.com'
   $apikey         = 'apikey'
+  $id             = 'OrganisationID'
   $collector      = 'collector.boundary.com'
   $collector_port = 4740
 

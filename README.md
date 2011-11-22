@@ -7,7 +7,7 @@ To use it:
 
     include bprobe
 
-You need need to specify your username and API key in the bprobe::params
+You need need to specify your Organisation ID and API key in the bprobe::params
 class (manifests/params.pp).
 
 To remove a meter change your include to:
