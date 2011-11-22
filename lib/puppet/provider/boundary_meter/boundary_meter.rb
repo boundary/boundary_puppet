@@ -30,7 +30,7 @@ module Boundary
     API_HOST = "api.boundary.com"
 
     def auth_encode(resource)
-      auth = Base64.encode64("#{resource[:username]}:#{resource[:apikey]}").strip
+      auth = Base64.encode64("#{resource[:apikey]}:").strip
       auth.gsub("\n","")
     end
 
@@ -42,18 +42,18 @@ module Boundary
     def build_url(resource, action)
       case action
       when :create
-        "https://#{API_HOST}/meters"
+        "https://#{API_HOST}/#{resource[:id]}/meters"
       when :search
-        "https://#{API_HOST}/meters?name=#{resource[:name]}"
+        "https://#{API_HOST}/#{resource[:id]}/meters?name=#{resource[:name]}"
       when :certificates
         meter_id = get_meter_id(resource)
-        "https://#{API_HOST}/meters/#{meter_id}"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
       when :tags
         meter_id = get_meter_id(resource)
-        "https://#{API_HOST}/meters/#{meter_id}/tags"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}/tags"
       when :delete
         meter_id = get_meter_id(resource)
-        "https://#{API_HOST}/meters/#{meter_id}"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
       end
     end
 
@@ -122,10 +122,17 @@ module Boundary
 
         if response
           body = JSON.parse(response.body)
-          body[0]["id"]
+          if body[0]
+            if body[0]["id"]
+              body[0]["id"]
+            else
+              raise Puppet::Error, "Could not get meter id (nil response)!"
+            end
+          else
+            raise Puppet::Error, "Could not get meter id (nil response)!"
+          end
         else
           raise Puppet::Error, "Could not get meter id (nil response)!"
-          nil
         end
 
       rescue Exception => e
