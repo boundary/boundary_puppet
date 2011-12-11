@@ -20,7 +20,8 @@
 #
 
 require "rubygems"
-require "excon"
+require "uri"
+require "net/https"
 require "json"
 require "base64"
 
@@ -46,13 +47,13 @@ module Boundary
       when :search
         "https://#{API_HOST}/#{resource[:id]}/meters?name=#{resource[:name]}"
       when :certificates
-        meter_id = get_meter_id(resource)
+        meter_id = get_meter("id", resource)
         "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
       when :tags
-        meter_id = get_meter_id(resource)
+        meter_id = get_meter("id", resource)
         "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}/tags"
       when :delete
-        meter_id = get_meter_id(resource)
+        meter_id = get_meter("id", resource)
         "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
       end
     end
@@ -64,13 +65,10 @@ module Boundary
         body = {:name => resource[:name]}.to_json
 
         Puppet.info("Creating meter #{resource[:name]}")
-        response = http_post_request(url, headers, body)
+        response = http_request(:post, url, headers, body)
 
-        download_certificate_request(resource)
-        download_key_request(resource)
-        if resource[:tags]
-          apply_meter_tags(resource)
-        end
+        download_request("key", resource)
+        download_request("cert", resource)
       rescue Exception => e
           raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
       end
@@ -82,180 +80,132 @@ module Boundary
         headers = generate_headers(resource)
 
         Puppet.info("Deleting meter #{resource[:name]}")
-        response = http_delete_request(url, headers)
+        response = http_request(:delete, url, headers)
       rescue Exception => e
         raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
       end
     end
 
-    def meter_exists?(resource)
+    def get_meter(data, resource)
       begin
         url = build_url(resource, :search)
         headers = generate_headers(resource)
 
-        response = http_get_request(url, headers)
-
-        if response
-          body = JSON.parse(response.body)
-
-          if body == []
-            false
-          else
-            true
-          end
-        else
-          raise Puppet::Error, "Could not determine if meter exists (nil response)!"
-          nil
-        end
-      rescue Exception => e
-        raise Puppet::Error, "Could not determine if meter exists, failed with #{e}"
-        nil
-      end
-    end
-
-    def get_meter_id(resource)
-      begin
-        url = build_url(resource, :search)
-        headers = generate_headers(resource)
-
-        response = http_get_request(url, headers)
+        response = http_request(:get, url, headers)
 
         if response
           body = JSON.parse(response.body)
           if body[0]
-            if body[0]["id"]
-              body[0]["id"]
+            if body[0]["#{data}"]
+              body[0]["#{data}"]
             else
-              raise Puppet::Error, "Could not get meter id (nil response)!"
+              raise Puppet::Error, "Could not get meter #{data} (nil response)!"
             end
           else
-            raise Puppet::Error, "Could not get meter id (nil response)!"
+            return false
           end
         else
-          raise Puppet::Error, "Could not get meter id (nil response)!"
+          raise Puppet::Error, "Could not get meter (nil response)!"
         end
 
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter id, failed with #{e}"
+        raise Puppet::Error, "Could not get meter #{data}, failed with #{e}"
         nil
       end
     end
 
-    def download_certificate_request(resource)
+    def download_request(type, resource)
       begin
         base_url = build_url(resource, :certificates)
         headers = generate_headers(resource)
 
-        cert_response = http_get_request("#{base_url}/cert.pem", headers)
+        response = http_request(:get, "#{base_url}/#{type}.pem", headers)
 
-        if cert_response
-          cert_file = '/etc/bprobe/cert.pem'
-          File.open(cert_file, 'w') {|f| f.write(cert_response.body) }
-          File.chmod(0600, cert_file)
-          File.chown(1, 1, cert_file)
+        if response
+          file = "/etc/bprobe/#{type}.pem"
+          File.open(file, 'w') {|f| f.write(response.body) }
+          File.chmod(0600, file)
+          File.chown(1, 1, file)
         else
-          raise Puppet::Error, "Could not download certificate (nil response)!"
+          raise Puppet::Error, "Could not download #{type} (nil response)!"
         end
       rescue Exception => e
-        raise Puppet::Error, "Could not download certificate, failed with #{e}"
+        raise Puppet::Error, "Could not download #{type}, failed with #{e}"
       end
     end
 
-    def download_key_request(resource)
-      begin
-        base_url = build_url(resource, :certificates)
-        headers = generate_headers(resource)
-
-        key_response = http_get_request("#{base_url}/key.pem", headers)
-
-        if key_response
-          key_file = '/etc/bprobe/key.pem'
-          File.open(key_file, 'w') {|f| f.write(key_response.body) }
-          File.chmod(0600, key_file)
-          File.chown(1, 1, key_file)
-        else
-          raise Puppet::Error, "Could not download key (nil response)!"
+    def set_meter_tags(value, resource)
+      meter_tags = get_meter("tags", resource).sort
+      new_tags = value.sort
+      new_tags.each do |t|
+        unless meter_tags.include?(t)
+          add_meter_tag(t)
         end
-      rescue Exception => e
-        raise Puppet::Error, "Could not download key, failed with #{e}"
+      end
+      old_tags = meter_tags - new_tags
+      old_tags.each do |t|
+        remove_meter_tag(t)
       end
     end
 
-    def apply_meter_tags(resource)
-      tags = resource[:tags]
-
+    def add_meter_tag(tag)
       begin
         url = build_url(resource, :tags)
         headers = generate_headers(resource)
 
-        Puppet.info("Applying meter tags #{tags.inspect}")
-
-        tags.each do |tag|
-          http_put_request("#{url}/#{tag}", headers, "")
-        end
+        http_request(:put, "#{url}/#{tag}", headers, "")
       rescue Exception => e
-          raise Puppet::Error, "Could not apply meter tag, failed with #{e}"
+          raise Puppet::Error, "Could not add meter tag: #{tag}, failed with #{e}"
       end
     end
 
-    def http_get_request(url, headers)
+    def remove_meter_tag(tag)
+      begin
+        url = build_url(resource, :tags)
+        headers = generate_headers(resource)
+
+        http_request(:delete, "#{url}/#{tag}", headers, "")
+      rescue Exception => e
+          raise Puppet::Error, "Could not remove meter tag: #{tag}, failed with #{e}"
+      end
+    end
+
+    def http_request(method, url, headers, body=nil)
       Puppet.debug("Url: #{url}")
-      Puppet.debug("Headers: #{headers}")
+      Puppet.debug("Headers: #{headers.to_hash.inspect}")
+      Puppet.debug("Body: #{body}")
 
-      response = Excon.get(url, :headers => headers)
+      uri = URI(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.ca_file = "/etc/bprobe/cacert.pem"
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-      Puppet.debug("Body: #{response.body}")
-      Puppet.debug("Status: #{response.status}")
-
-      if bad_response?(:get, url, response)
-        nil
+      case method
+      when :get
+        req = Net::HTTP::Get.new(uri.request_uri)
+      when :post
+        req = Net::HTTP::Post.new(uri.request_uri)
+        req.body = body
+      when :put
+        req = Net::HTTP::Put.new(uri.request_uri)
+        req.body = body
+      when :delete
+        req = Net::HTTP::Delete.new(uri.request_uri)
       else
-        response
-      end
-    end
-
-    def http_delete_request(url, headers)
-      Puppet.debug("Url: #{url}")
-      Puppet.debug("Headers: #{headers}")
-
-      response = Excon.delete(url, :headers => headers)
-
-      Puppet.debug("Body: #{response.body}")
-      Puppet.debug("Status: #{response.status}")
-
-      if bad_response?(:delete, url, response)
+        raise Puppet::Error, "Unsupported http method (nil response)!"
         nil
-      else
-        response
       end
-    end
 
-    def http_put_request(url, headers, body)
-      Puppet.debug("Url: #{url}")
-      Puppet.debug("Headers: #{headers}")
+      headers.each{|k,v|
+        req[k] = v
+      }
+      response = http.request(req)
 
-      response = Excon.put(url, :headers => headers, :body => body)
+      Puppet.debug("Response Body: #{response.body}")
+      Puppet.debug("Status: #{response.code}")
 
-      Puppet.debug("Body: #{response.body}")
-      Puppet.debug("Status: #{response.status}")
-
-      if bad_response?(:put, url, response)
-        nil
-      else
-        response
-      end
-    end
-
-    def http_post_request(url, headers, body)
-      Puppet.debug("Url: #{url}")
-      Puppet.debug("Headers: #{headers}")
-
-      response = Excon.post(url, :headers => headers, :body => body)
-
-      Puppet.debug("Body: #{response.body}")
-      Puppet.debug("Status: #{response.status}")
-
-      if bad_response?(:post, url, response)
+      if bad_response?(method, url, response)
         nil
       else
         response
@@ -263,11 +213,13 @@ module Boundary
     end
 
     def bad_response?(method, url, response)
-      if response.status >= 400
-        raise Puppet::Error, "Got a #{response.status} for #{method} to #{url}"
-        true
-      else
+      case response
+      when Net::HTTPSuccess
         false
+      else
+        true
+        raise Puppet::Error, "Got a #{response.code} for #{method} to #{url}"
+        true
       end
     end
   end
@@ -290,7 +242,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def exists?
-    meter_exists?(resource)
+    get_meter("id", resource)
   end
 
   def destroy
@@ -299,5 +251,13 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
     rescue Exception => e
       raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
     end
+  end
+
+  def tags
+    get_meter("tags", resource)
+  end
+
+  def tags=(value)
+    set_meter_tags(value, resource)
   end
 end

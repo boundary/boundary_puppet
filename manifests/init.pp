@@ -28,9 +28,10 @@ class bprobe {
   $collector_port = $bprobe::params::collector_port
 
   boundary_meter { $fqdn:
-    ensure   => present,
-    id       => $id,
-    apikey   => $apikey,
+    ensure  => present,
+    id      => $id,
+    apikey  => $apikey,
+    require => [ Package['brobe'], File['/etc/bprobe/cacert.pem'] ],
   }
 
   file { '/etc/bprobe/':
@@ -58,6 +59,16 @@ class bprobe {
   file { '/etc/bprobe/ca.pem':
     ensure  => present,
     source  => 'puppet:///modules/bprobe/ca.pem',
+    mode    => '0600',
+    owner   => 'root',
+    group   => 'root',
+    notify  => Service['bprobe'],
+    require => Package['bprobe'],
+  }
+
+  file { '/etc/bprobe/cacert.pem':
+    ensure  => present,
+    source  => 'puppet:///modules/bprobe/cacert.pem',
     mode    => '0600',
     owner   => 'root',
     group   => 'root',
