@@ -16,7 +16,7 @@ Puppet::Type.newtype(:boundary_meter) do
     desc "The Boundary API key."
   end
 
-  newparam(:tags) do
+  newproperty(:tags, :array_matching => :all) do
     desc "Tags to be added to the Boundary meter. Specify a tag or an array of tags."
   end
 end

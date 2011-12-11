@@ -1,5 +1,5 @@
 name    'puppetlabs-bprobe'
-version '0.0.2'
+version '0.0.3'
 source 'UNKNOWN'
 author 'puppetlabs'
 license 'Apache 2.0'

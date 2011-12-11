@@ -20,7 +20,7 @@
 
 class bprobe::dependencies {
 
-  package { [ 'excon', 'json' ]:
+  package { 'json':
     ensure   => latest,
     provider => gem,
   }
