@@ -47,14 +47,11 @@ module Boundary
       when :search
         "https://#{API_HOST}/#{resource[:id]}/meters?name=#{resource[:name]}"
       when :certificates
-        meter_id = get_meter("id", resource)
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}"
       when :tags
-        meter_id = get_meter("id", resource)
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}/tags"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}/tags"
       when :delete
-        meter_id = get_meter("id", resource)
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{meter_id}"
+        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}"
       end
     end
 
@@ -67,8 +64,14 @@ module Boundary
         Puppet.info("Creating meter #{resource[:name]}")
         response = http_request(:post, url, headers, body)
 
+        body = JSON.parse(response.body)
+        @meter_id = body["id"]
+        @tags = body["tags"]
         download_request("key", resource)
         download_request("cert", resource)
+        if resource[:tags]
+          set_meter_tags(resource)
+        end
       rescue Exception => e
           raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
       end
@@ -134,9 +137,9 @@ module Boundary
       end
     end
 
-    def set_meter_tags(value, resource)
-      meter_tags = get_meter("tags", resource).sort
-      new_tags = value.sort
+    def set_meter_tags(resource)
+      meter_tags = @tags || get_meter("tags", resource)
+      new_tags = resource[:tags]
       new_tags.each do |t|
         unless meter_tags.include?(t)
           add_meter_tag(t)
@@ -155,7 +158,7 @@ module Boundary
 
         http_request(:put, "#{url}/#{tag}", headers, "")
       rescue Exception => e
-          raise Puppet::Error, "Could not add meter tag: #{tag}, failed with #{e}"
+        raise Puppet::Error, "Could not add meter tag: #{tag}, failed with #{e}"
       end
     end
 
@@ -242,7 +245,12 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def exists?
-    get_meter("id", resource)
+    @meter_id = get_meter("id", resource)
+    if @meter_id
+      true
+    else
+      false
+    end
   end
 
   def destroy
@@ -254,10 +262,11 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def tags
-    get_meter("tags", resource)
+    @tags = get_meter("tags", resource)
+    @tags
   end
 
-  def tags=(value)
-    set_meter_tags(value, resource)
+  def tags=(tags)
+    set_meter_tags(resource)
   end
 end
