@@ -31,7 +31,7 @@ class bprobe {
     ensure  => present,
     id      => $id,
     apikey  => $apikey,
-    require => [ Package['brobe'], File['/etc/bprobe/cacert.pem'] ],
+    require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
   }
 
   file { '/etc/bprobe/':
