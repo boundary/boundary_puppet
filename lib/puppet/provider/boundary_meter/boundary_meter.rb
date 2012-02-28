@@ -19,10 +19,8 @@
 # limitations under the License.
 #
 
-require "rubygems"
 require "uri"
 require "net/https"
-require "json"
 require "base64"
 
 module Boundary
@@ -59,12 +57,12 @@ module Boundary
       begin
         url = build_url(resource, :create)
         headers = generate_headers(resource)
-        body = {:name => resource[:name]}.to_json
+        body = {:name => resource[:name]}.to_pson
 
         Puppet.info("Creating meter #{resource[:name]}")
         response = http_request(:post, url, headers, body)
 
-        body = JSON.parse(response.body)
+        body = PSON.parse(response.body)
         @meter_id = body["id"]
         @tags = body["tags"]
         download_request("key", resource)
@@ -97,7 +95,7 @@ module Boundary
         response = http_request(:get, url, headers)
 
         if response
-          body = JSON.parse(response.body)
+          body = PSON.parse(response.body)
           if body[0]
             if body[0]["#{data}"]
               body[0]["#{data}"]

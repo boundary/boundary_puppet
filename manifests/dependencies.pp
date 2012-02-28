@@ -20,11 +20,6 @@
 
 class bprobe::dependencies {
 
-  package { 'json':
-    ensure   => latest,
-    provider => gem,
-  }
-
   case $operatingsystem {
     'redhat', 'centos': {
 
