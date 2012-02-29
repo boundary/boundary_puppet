@@ -20,7 +20,7 @@
 
 class bprobe::dependencies {
 
-  case $operatingsystem {
+  case $::operatingsystem {
     'redhat', 'centos': {
 
       file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-Boundary':

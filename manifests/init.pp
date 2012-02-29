@@ -27,7 +27,7 @@ class bprobe {
   $collector      = $bprobe::params::collector
   $collector_port = $bprobe::params::collector_port
 
-  boundary_meter { $fqdn:
+  boundary_meter { $::fqdn:
     ensure  => present,
     id      => $id,
     apikey  => $apikey,
