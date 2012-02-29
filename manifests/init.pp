@@ -79,6 +79,7 @@ class bprobe {
   service { 'bprobe':
     ensure  => running,
     enable  => true,
+    hasstatus => false,
     require => Package['bprobe'],
   }
 }
