@@ -136,14 +136,13 @@ module Boundary
     end
 
     def set_meter_tags(resource)
-      meter_tags = @tags || get_meter("tags", resource)
       new_tags = resource[:tags]
       new_tags.each do |t|
-        unless meter_tags.include?(t)
+        unless tags.include?(t)
           add_meter_tag(t)
         end
       end
-      old_tags = meter_tags - new_tags
+      old_tags = tags - new_tags
       old_tags.each do |t|
         remove_meter_tag(t)
       end
