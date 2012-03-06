@@ -259,8 +259,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def tags
-    @tags = get_meter("tags", resource)
-    @tags
+    @tags ||= get_meter("tags", resource)
   end
 
   def tags=(tags)
