@@ -18,5 +18,9 @@ Puppet::Type.newtype(:boundary_meter) do
 
   newproperty(:tags, :array_matching => :all) do
     desc "Tags to be added to the Boundary meter. Specify a tag or an array of tags."
+
+    def insync?(is)
+      is.sort == @should.sort
+    end
   end
 end
