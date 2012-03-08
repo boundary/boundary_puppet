@@ -19,10 +19,8 @@
 # limitations under the License.
 #
 
-require "rubygems"
 require "uri"
 require "net/https"
-require "json"
 require "base64"
 
 module Boundary
@@ -59,12 +57,12 @@ module Boundary
       begin
         url = build_url(resource, :create)
         headers = generate_headers(resource)
-        body = {:name => resource[:name]}.to_json
+        body = {:name => resource[:name]}.to_pson
 
         Puppet.info("Creating meter #{resource[:name]}")
         response = http_request(:post, url, headers, body)
 
-        body = JSON.parse(response.body)
+        body = PSON.parse(response.body)
         @meter_id = body["id"]
         @tags = body["tags"]
         download_request("key", resource)
@@ -97,7 +95,7 @@ module Boundary
         response = http_request(:get, url, headers)
 
         if response
-          body = JSON.parse(response.body)
+          body = PSON.parse(response.body)
           if body[0]
             if body[0]["#{data}"]
               body[0]["#{data}"]
@@ -138,14 +136,13 @@ module Boundary
     end
 
     def set_meter_tags(resource)
-      meter_tags = @tags || get_meter("tags", resource)
       new_tags = resource[:tags]
       new_tags.each do |t|
-        unless meter_tags.include?(t)
+        unless tags.include?(t)
           add_meter_tag(t)
         end
       end
-      old_tags = meter_tags - new_tags
+      old_tags = tags - new_tags
       old_tags.each do |t|
         remove_meter_tag(t)
       end
@@ -262,8 +259,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def tags
-    @tags = get_meter("tags", resource)
-    @tags
+    @tags ||= get_meter("tags", resource)
   end
 
   def tags=(tags)

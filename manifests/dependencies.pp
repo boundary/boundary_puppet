@@ -20,12 +20,7 @@
 
 class bprobe::dependencies {
 
-  package { 'json':
-    ensure   => latest,
-    provider => gem,
-  }
-
-  case $operatingsystem {
+  case $::operatingsystem {
     'redhat', 'centos': {
 
       file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-Boundary':
@@ -49,14 +44,18 @@ class bprobe::dependencies {
 
     'debian', 'ubuntu': {
 
-      exec { 'add-key':
-        command     => '/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 6532CC20 && apt-get update',
-        unless      => "apt-key list | grep -qF '6532CC20'",
-        refreshonly => true,
-      }
-
       package { 'apt-transport-https':
         ensure => latest,
+      }
+
+      file { '/etc/apt/trusted.gpg.d/boundary.gpg':
+        source => 'puppet:///modules/bprobe/boundary.gpg',
+        notify => Exec['add-boundary-apt-key']
+      }
+
+      exec { 'add-boundary-apt-key':
+        command     => 'apt-key add /etc/apt/trusted.gpg.d/boundary.gpg',
+        refreshonly => true
       }
 
       file { '/etc/apt/sources.list.d/boundary.list':
@@ -65,8 +64,8 @@ class bprobe::dependencies {
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        require => Package['apt-transport-https'],
-        notify  => Exec['apt-update'],
+        require => [Package['apt-transport-https'], File['/etc/apt/trusted.gpg.d/boundary.gpg']],
+        notify => Exec['apt-update']
       }
 
       exec { 'apt-update':
