@@ -22,12 +22,12 @@ class bprobe::delete {
 
   require bprobe::params
 
-  $username       = $bprobe::params::username
+  $id             = $bprobe::params::id
   $apikey         = $bprobe::params::apikey
 
   boundary_meter { $fqdn:
     ensure   => absent,
-    username => $username,
+    id       => $id,
     apikey   => $apikey,
   }
 
