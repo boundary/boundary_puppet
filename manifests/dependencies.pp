@@ -20,6 +20,10 @@
 
 class bprobe::dependencies {
 
+  Exec {
+    path => '/usr/bin:/usr/sbin:/bin:/sbin',
+  }
+  
   case $::operatingsystem {
     'redhat', 'centos': {
 
@@ -50,12 +54,12 @@ class bprobe::dependencies {
 
       file { '/etc/apt/trusted.gpg.d/boundary.gpg':
         source => 'puppet:///modules/bprobe/boundary.gpg',
-        notify => Exec['add-boundary-apt-key']
+        notify => Exec['add-boundary-apt-key'],
       }
 
       exec { 'add-boundary-apt-key':
         command     => 'apt-key add /etc/apt/trusted.gpg.d/boundary.gpg',
-        refreshonly => true
+        refreshonly => true,
       }
 
       file { '/etc/apt/sources.list.d/boundary.list':
@@ -65,12 +69,12 @@ class bprobe::dependencies {
         group   => 'root',
         mode    => '0644',
         require => [Package['apt-transport-https'], File['/etc/apt/trusted.gpg.d/boundary.gpg']],
-        notify => Exec['apt-update']
+        notify => Exec['apt-update'],
       }
 
       exec { 'apt-update':
         command     => '/usr/bin/apt-get update',
-        refreshonly => true;
+        refreshonly => true,
       }
     }
 
