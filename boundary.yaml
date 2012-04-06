@@ -1,0 +1,5 @@
+---
+:boundary_orgid: 'orgid'
+:boundary_apikey: 'apikey'
+:github_token: 'token'
+:github_user: 'user'
