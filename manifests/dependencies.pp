@@ -1,7 +1,7 @@
 #
 # Author:: James Turnbull <james@lovedthanlost.net>
 # Module Name:: boundary
-# Class:: bprobe::dependencies
+# Class:: boundary::dependencies
 #
 # Copyright 2011, Puppet Labs
 #
@@ -69,7 +69,7 @@ class boundary::dependencies {
         group   => 'root',
         mode    => '0644',
         require => [Package['apt-transport-https'], File['/etc/apt/trusted.gpg.d/boundary.gpg']],
-        notify => Exec['apt-update'],
+        notify  => Exec['apt-update'],
       }
 
       exec { 'apt-update':

@@ -77,9 +77,9 @@ class boundary {
   }
 
   service { 'bprobe':
-    ensure  => running,
-    enable  => true,
+    ensure    => running,
+    enable    => true,
     hasstatus => false,
-    require => Package['bprobe'],
+    require   => Package['bprobe'],
   }
 }

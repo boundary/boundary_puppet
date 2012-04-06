@@ -1,7 +1,7 @@
 #
 # Author:: James Turnbull <james@lovedthanlost.net>
 # Module Name:: boundary
-# Class:: bprobe::delete
+# Class:: boundary::delete
 #
 # Copyright 2011, Puppet Labs
 #
@@ -22,10 +22,10 @@ class boundary::delete {
 
   require boundary::params
 
-  $id             = $bprobe::params::id
-  $apikey         = $bprobe::params::apikey
+  $id             = $boundary::params::id
+  $apikey         = $boundary::params::apikey
 
-  boundary_meter { $fqdn:
+  boundary_meter { $::fqdn:
     ensure   => absent,
     id       => $id,
     apikey   => $apikey,
