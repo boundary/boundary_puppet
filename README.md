@@ -1,18 +1,18 @@
-Boundary probe module
+Boundary module
 ===
 
-This is the bprobe module.
+This is the boundary module.
 
 To use it:
 
-    include bprobe
+    include boundary
 
-You need need to specify your Organisation ID and API key in the bprobe::params
+You need need to specify your Organisation ID and API key in the boundary::params
 class (manifests/params.pp).
 
 To remove a meter change your include to:
 
-    include bprobe::delete
+    include boundary::delete
 
 Author
 ---
@@ -24,7 +24,7 @@ The boundary_meter type and provider is heavily based on work by Joe Williams an
 Copyright
 ---
 
-Puppet Labs 2011
+Puppet Labs 2011-2012
 
 License
 ---

@@ -1,6 +1,6 @@
 #
 # Author:: James Turnbull <james@lovedthanlost.net>
-# Module Name:: bprobe
+# Module Name:: boundary
 # Class:: bprobe::dependencies
 #
 # Copyright 2011, Puppet Labs
@@ -18,18 +18,18 @@
 # limitations under the License.
 #
 
-class bprobe::dependencies {
+class boundary::dependencies {
 
   Exec {
     path => '/usr/bin:/usr/sbin:/bin:/sbin',
   }
-  
+
   case $::operatingsystem {
     'redhat', 'centos': {
 
       file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-Boundary':
         ensure => present,
-        source => 'puppet:///modules/bprobe/RPM-GPG-KEY-Boundary',
+        source => 'puppet:///modules/boundary/RPM-GPG-KEY-Boundary',
       }
 
       exec { 'import_key':
@@ -53,7 +53,7 @@ class bprobe::dependencies {
       }
 
       file { '/etc/apt/trusted.gpg.d/boundary.gpg':
-        source => 'puppet:///modules/bprobe/boundary.gpg',
+        source => 'puppet:///modules/boundary/boundary.gpg',
         notify => Exec['add-boundary-apt-key'],
       }
 
@@ -64,7 +64,7 @@ class bprobe::dependencies {
 
       file { '/etc/apt/sources.list.d/boundary.list':
         ensure  => present,
-        content => template('bprobe/apt_source.erb'),
+        content => template('boundary/apt_source.erb'),
         owner   => 'root',
         group   => 'root',
         mode    => '0644',

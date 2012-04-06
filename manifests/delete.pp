@@ -1,6 +1,6 @@
 #
 # Author:: James Turnbull <james@lovedthanlost.net>
-# Module Name:: bprobe
+# Module Name:: boundary
 # Class:: bprobe::delete
 #
 # Copyright 2011, Puppet Labs
@@ -18,9 +18,9 @@
 # limitations under the License.
 #
 
-class bprobe::delete {
+class boundary::delete {
 
-  require bprobe::params
+  require boundary::params
 
   $id             = $bprobe::params::id
   $apikey         = $bprobe::params::apikey

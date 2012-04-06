@@ -1,6 +1,6 @@
 #
 # Author:: James Turnbull <james@puppetlabs.com>
-# Module Name:: bprobe
+# Module Name:: boundary
 #
 # Copyright 2011, Puppet Labs
 #
@@ -17,15 +17,15 @@
 # limitations under the License.
 #
 
-class bprobe {
+class boundary {
 
-  require bprobe::params
-  require bprobe::dependencies
+  require boundary::params
+  require boundary::dependencies
 
-  $id             = $bprobe::params::id
-  $apikey         = $bprobe::params::apikey
-  $collector      = $bprobe::params::collector
-  $collector_port = $bprobe::params::collector_port
+  $id             = $boundary::params::id
+  $apikey         = $boundary::params::apikey
+  $collector      = $boundary::params::collector
+  $collector_port = $boundary::params::collector_port
 
   boundary_meter { $::fqdn:
     ensure  => present,
@@ -48,7 +48,7 @@ class bprobe {
 
   file { '/etc/bprobe/bprobe.defaults':
     ensure  => present,
-    content => template('bprobe/bprobe.defaults.erb'),
+    content => template('boundary/bprobe.defaults.erb'),
     mode    => '0600',
     owner   => 'root',
     group   => 'root',
@@ -58,7 +58,7 @@ class bprobe {
 
   file { '/etc/bprobe/ca.pem':
     ensure  => present,
-    source  => 'puppet:///modules/bprobe/ca.pem',
+    source  => 'puppet:///modules/boundary/ca.pem',
     mode    => '0600',
     owner   => 'root',
     group   => 'root',
@@ -68,7 +68,7 @@ class bprobe {
 
   file { '/etc/bprobe/cacert.pem':
     ensure  => present,
-    source  => 'puppet:///modules/bprobe/cacert.pem',
+    source  => 'puppet:///modules/boundary/cacert.pem',
     mode    => '0600',
     owner   => 'root',
     group   => 'root',

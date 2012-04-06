@@ -1,7 +1,7 @@
 #
 # Author:: James Turnbull <james@puppetlabs.com>
-# Module Name:: bprobe
-# Class:: bprobe::params
+# Module Name:: boundary
+# Class:: boundary::params
 #
 # Copyright 2011, Puppet Labs
 #
@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-class bprobe::params {
+class boundary::params {
 
   $apikey         = 'apikey'
   $id             = 'OrganisationID'
