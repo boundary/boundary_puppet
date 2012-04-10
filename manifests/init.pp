@@ -27,13 +27,6 @@ class boundary {
   $collector      = $boundary::params::collector
   $collector_port = $boundary::params::collector_port
 
-  boundary_meter { $::fqdn:
-    ensure  => present,
-    id      => $id,
-    apikey  => $apikey,
-    require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
-  }
-
   file { '/etc/bprobe/':
     ensure => directory,
     mode   => '0755',
@@ -75,11 +68,18 @@ class boundary {
     notify  => Service['bprobe'],
     require => Package['bprobe'],
   }
+  
+  boundary_meter { $::fqdn:
+    ensure  => present,
+    id      => $id,
+    apikey  => $apikey,
+    require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
+  }
 
   service { 'bprobe':
     ensure    => running,
     enable    => true,
     hasstatus => false,
-    require   => Package['bprobe'],
+    require   => Boundary_meter[$::fqdn],
   }
 }
