@@ -42,7 +42,7 @@ class boundary::dependencies {
 
       yumrepo { 'boundary':
         enabled  => 1,
-        baseurl  => "https://yum.boundary.com/centos/os/5.5/$::architecture/",
+        baseurl  => "https://yum.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
         gpgcheck => 1,
         gpgkey   => 'https://yum.boundary.com/RPM-GPG-KEY-Boundary',
       }

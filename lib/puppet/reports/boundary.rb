@@ -1,6 +1,5 @@
 require 'puppet'
 require 'yaml'
-require 'json'
 require 'net/http'
 require 'net/https'
 require 'uri'
@@ -50,7 +49,7 @@ Puppet::Reports.register_report(:boundary) do
           "description" => "Puppet run #{status} on #{host} @ #{Time.now.asctime}",
           "public" => false
         })
-        gist_id = JSON.parse(res.body)["gists"].first["repo"]
+        gist_id = PSON.parse(res.body)["gists"].first["repo"]
         Puppet.info "Create a GitHub Gist @ https://gist.github.com/#{gist_id}"
         gist_id
       end
@@ -80,7 +79,7 @@ Puppet::Reports.register_report(:boundary) do
       ]
     }
 
-    annotation_json = annotation.to_json
+    annotation_pson = annotation.to_pson
 
     uri = URI("https://api.boundary.com/#{BOUNDARY_ORG}/annotations")
     http = Net::HTTP.new(uri.host, uri.port)
@@ -91,7 +90,7 @@ Puppet::Reports.register_report(:boundary) do
     begin
       timeout(10) do
         req = Net::HTTP::Post.new(uri.request_uri)
-        req.body = annotation_json
+        req.body = annotation_pson
 
         headers.each{|k,v|
           req[k] = v
