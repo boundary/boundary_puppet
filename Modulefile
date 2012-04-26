@@ -1,5 +1,5 @@
 name    'puppetlabs-boundary'
-version '0.0.7'
+version '0.0.8'
 source 'UNKNOWN'
 author 'puppetlabs'
 license 'Apache 2.0'
