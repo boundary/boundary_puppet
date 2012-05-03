@@ -32,9 +32,9 @@ Puppet::Reports.register_report(:boundary) do
       create_annotation(tags,type,self.host,self.time)
     end
   else
-    Puppet.debug "Boundary annotations disabled")
+    Puppet.debug "Boundary annotations disabled"
     def process
-      Puppet.info "Boundary annotations disabled: report config file #{configfile} not readable")
+      Puppet.info "Boundary annotations disabled: report config file #{configfile} not readable"
     end
   end
 
