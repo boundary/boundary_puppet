@@ -10,57 +10,35 @@ end
 
 Puppet::Reports.register_report(:boundary) do
 
-  configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
-  raise(Puppet::ParseError, "Boundary report config file #{configfile} not readable") unless File.exist?(configfile)
-  @config = YAML.load_file(configfile)
-  GH_USER, GH_TOKEN = @config[:github_user], @config[:github_token]
-  BOUNDARY_API, BOUNDARY_ORG = @config[:boundary_apikey], @config[:boundary_orgid]
-
   desc <<-DESC
   Send notification Puppet runs as Boundary annotations.
   DESC
 
-  def process
-    return if self.status == 'unchanged'
-    if self.status == 'failed'
-      tags = ["puppet", "exception", "failure", self.status ]
-      type = "Puppet Exception"
-    else
-      tags = ["puppet", self.status ]
-      type = "Puppet"
-    end
+  configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
+  if File.exists?(configfile)
+    @config = YAML.load_file(configfile)
+    BOUNDARY_API, BOUNDARY_ORG = @config[:boundary_apikey], @config[:boundary_orgid]
 
-    output = []
-    self.logs.each do |log|
-      output << log
-    end
-
-    gist_id = gist(self.status,self.host,output)
-    annotation_url = create_annotation(gist_id,tags,type,self.host,self.time)
-  end
-
-  def gist(status,host,output)
-    begin
-      timeout(8) do
-        res = Net::HTTP.post_form(URI.parse("http://gist.github.com/api/v1/json/new"), {
-          "files[#{host}-#{Time.now.to_i.to_s}]" => output.join("\n"),
-          "login" => GH_USER,
-          "token" => GH_TOKEN,
-          "description" => "Puppet run #{status} on #{host} @ #{Time.now.asctime}",
-          "public" => false
-        })
-        gist_id = PSON.parse(res.body)["gists"].first["repo"]
-        Puppet.info "Create a GitHub Gist @ https://gist.github.com/#{gist_id}"
-        gist_id
+    def process
+      return if self.status == 'unchanged'
+      if self.status == 'failed'
+        tags = ["puppet", "exception", "failure", self.status ]
+        type = "Puppet Exception"
+      else
+        tags = ["puppet", self.status ]
+        type = "Puppet"
       end
-    rescue Timeout::Error
-      Puppet.error "Timed out while attempting to create a GitHub Gist, retrying ..."
-      max_attempts -= 1
-      retry if max_attempts > 0
+
+      create_annotation(tags,type,self.host,self.time)
+    end
+  else
+    Puppet.debug "Boundary annotations disabled"
+    def process
+      Puppet.info "Boundary annotations disabled: report config file #{configfile} not readable"
     end
   end
 
-  def create_annotation(gist_id,tags,type,host,time)
+  def create_annotation(tags,type,host,time)
     auth = auth_encode("#{BOUNDARY_API}:")
     headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
 
@@ -69,14 +47,7 @@ Puppet::Reports.register_report(:boundary) do
       :subtype => host,
       :start_time => time.to_i,
       :end_time => time.to_i,
-      :tags => tags,
-      :links => [
-        {
-         "rel" => "output",
-         "href" => "https://gist.github.com/#{gist_id}",
-         "note" => "gist"
-        }
-      ]
+      :tags => tags
     }
 
     annotation_pson = annotation.to_pson
@@ -118,8 +89,8 @@ Puppet::Reports.register_report(:boundary) do
     when Net::HTTPSuccess
       false
     else
-      true
       Puppet.error "Got a #{response.code} for #{method} to #{url}"
+      true
     end
   end
 end
