@@ -178,6 +178,7 @@ module Boundary
       uri = URI(url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
+      http.ssl_version="SSLv3"
       http.ca_file = "/etc/bprobe/cacert.pem"
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
