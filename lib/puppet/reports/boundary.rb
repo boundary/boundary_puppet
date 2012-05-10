@@ -14,9 +14,9 @@ Puppet::Reports.register_report(:boundary) do
   Send notification Puppet runs as Boundary annotations.
   DESC
 
-  configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
+  @configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
   if File.exists?(configfile)
-    @config = YAML.load_file(configfile)
+    @config = YAML.load_file(@configfile)
     BOUNDARY_API, BOUNDARY_ORG = @config[:boundary_apikey], @config[:boundary_orgid]
 
     def process
@@ -34,7 +34,7 @@ Puppet::Reports.register_report(:boundary) do
   else
     Puppet.debug "Boundary annotations disabled"
     def process
-      Puppet.info "Boundary annotations disabled: report config file #{configfile} not readable"
+      Puppet.info "Boundary annotations disabled: report config file #{@configfile} not readable"
     end
   end
 
