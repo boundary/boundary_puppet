@@ -14,6 +14,15 @@ To remove a meter change your include to:
 
     include boundary::delete
 
+To specify a stand-alone probe you can use the `boundary_meter` resource:
+
+    boundary_meter { "nameofprobe":
+      ensure  => present,
+      id      => '1234556789',
+      apikey  => 'abcdef123456',
+      tags    => [ "production", "web", "cluster" ],
+    }
+
 Report processor
 ==
 
@@ -25,9 +34,7 @@ Puppet runs that had changes or failed. To use it:
     path.
 
 2.  Update the `boundary_orgid` and `boundary_apikey` variables in the `boundary.yaml` 
-    file with your Boundary connection details. Specify the `github_user` and `github_token` 
-    options the report processor to create the Gist containing the log output from the run. 
-    The Gist will be linked in the Boundary annotation.
+    file with your Boundary connection details.
 
 3.  Enable pluginsync and reports on your master and clients in `puppet.conf`
 
@@ -46,7 +53,7 @@ Author
 
 James Turnbull <james@puppetlabs.com>
 
-The boundary_meter type and provider is heavily based on work by Joe Williams and Ben Black from Boundary.
+The `boundary_meter` type and provider is heavily based on work by Joe Williams and Ben Black from Boundary.
 
 Copyright
 ---
