@@ -1,6 +1,6 @@
 name    'puppetlabs-boundary'
-version '1.0.2'
-source 'UNKNOWN'
+version '1.0.3'
+source 'https://github.com/puppetlabs/puppetlabs-boundary'
 author 'puppetlabs'
 license 'Apache 2.0'
 summary 'Boundary meter module'
