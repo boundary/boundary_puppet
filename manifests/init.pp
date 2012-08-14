@@ -68,12 +68,18 @@ class boundary {
     notify  => Service['bprobe'],
     require => Package['bprobe'],
   }
-  
+
   boundary_meter { $::fqdn:
     ensure  => present,
     id      => $id,
     apikey  => $apikey,
     require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
+  }
+
+  if $boundary::params::tags {
+    Boundary_meter[$::fqdn] {
+      tags => $boundary::params::tags
+    }
   }
 
   service { 'bprobe':
