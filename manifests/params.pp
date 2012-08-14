@@ -32,5 +32,5 @@ class boundary::params {
   if $::boundary_collector_port { $collector_port = $::boundary_collector_port }
   else { $collector_port = 4740 }
 
-  if $::boundary_tags { $tags = split($boundary_tags, ',\s+') }
+  if $::boundary_tags { $tags = split($::boundary_tags, ',\s+') }
 }
