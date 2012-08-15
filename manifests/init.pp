@@ -36,7 +36,7 @@ class boundary {
 
   package { 'bprobe':
     ensure  => latest,
-    require => File['/etc/bprobe'],
+    require => File['/etc/bprobe/'],
   }
 
   file { '/etc/bprobe/bprobe.defaults':
