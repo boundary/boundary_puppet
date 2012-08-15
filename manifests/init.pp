@@ -68,7 +68,7 @@ class boundary {
     notify  => Service['bprobe'],
     require => Package['bprobe'],
   }
-  
+
   boundary_meter { $::fqdn:
     ensure  => present,
     id      => $id,
