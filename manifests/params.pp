@@ -20,9 +20,17 @@
 
 class boundary::params {
 
-  $apikey         = 'apikey'
-  $id             = 'OrganisationID'
-  $collector      = 'collector.boundary.com'
-  $collector_port = 4740
+  if $::boundary_apikey { $apikey = $::boundary_apikey }
+  else { $apikey = 'apikey' }
 
+  if $::boundary_id { $id = $::boundary_id }
+  else { $id = 'OrganisationID' }
+
+  if $::boundary_collector { $collector = $::boundary_collector }
+  else { $collector = 'collector.boundary.com' }
+
+  if $::boundary_collector_port { $collector_port = $::boundary_collector_port }
+  else { $collector_port = 4740 }
+
+  if $::boundary_tags { $tags = split($::boundary_tags, ',\s+') }
 }
