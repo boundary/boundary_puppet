@@ -38,7 +38,7 @@ supported:
 - `boundary_tags`
 
 The `boundary_tags` parameter is a comma separated list of tag names to apply
-to this brobe (e.g., 'a, list, of, tags'). Whitespace is fine. If you want to
+to this bprobe (e.g., 'a, list, of, tags'). Whitespace is fine. If you want to
 tag nodes indivdually you should at the `boundary` class directly to each
 node. Similarly you can tag at the group level. Currently you cannot tag at
 both the node and group level.
