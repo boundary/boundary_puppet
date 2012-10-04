@@ -1,2 +1,2 @@
-deb https://apt.boundary.com/<%= scope.lookupvar("::operatingsystem").downcase %>/ <%= scope.lookupvar("::lsbdistcodename") %> <%= if $operatingsystem == "Debian" then "main" else "universe" end %>
+deb https://apt.boundary.com/<%= scope.lookupvar("::operatingsystem").downcase %>/ <%= scope.lookupvar("::lsbdistcodename") %> <%= if scope.lookupvar("::operatingsystem") == "Debian" then "main" else "universe" end %>
 # deb https://apt.boundary.com/ubuntu/ lucid universe
