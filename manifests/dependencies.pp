@@ -41,6 +41,7 @@ class boundary::dependencies {
       }
 
       yumrepo { 'boundary':
+        descr    => 'Boundary $::operatingsystemrelease $::architecture Repository ',
         enabled  => 1,
         baseurl  => "https://yum.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
         gpgcheck => 1,
