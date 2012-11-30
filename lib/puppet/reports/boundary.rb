@@ -15,7 +15,7 @@ Puppet::Reports.register_report(:boundary) do
   DESC
 
   @configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
-  if File.exists?(configfile)
+  if File.exists?(@configfile)
     @config = YAML.load_file(@configfile)
     BOUNDARY_API, BOUNDARY_ORG = @config[:boundary_apikey], @config[:boundary_orgid]
 
