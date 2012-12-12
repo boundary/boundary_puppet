@@ -23,4 +23,12 @@ Puppet::Type.newtype(:boundary_meter) do
       is.sort == @should.sort
     end
   end
+
+  newparam(:proxy_addr) do
+    desc "Proxy meter management through this host"
+  end
+
+  newparam(:proxy_port) do
+    desc "Proxy meter management through this port"
+  end
 end
