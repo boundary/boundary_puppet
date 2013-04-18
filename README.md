@@ -23,6 +23,9 @@ To specify a stand-alone probe you can use the `boundary_meter` resource:
       tags    => [ "production", "web", "cluster" ],
     }
 
+You can also use the `proxy_addr` and `proxy_port` options to specify a
+proxy server if required.
+
 Dashboard Support
 ==
 
