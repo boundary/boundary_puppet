@@ -25,7 +25,7 @@ class boundary::dependencies {
   }
 
   case $::operatingsystem {
-    'RedHat', 'redhat', 'centos', 'Amazon': {
+    'RedHat', 'redhat', 'CentOS', 'centos', 'Amazon': {
 
       $rpmkey = '/etc/pki/rpm-gpg/RPM-GPG-KEY-Boundary'
 
@@ -44,7 +44,7 @@ class boundary::dependencies {
         descr    => "Boundary $::operatingsystemrelease $::architecture Repository ",
         enabled  => 1,
         baseurl  => $::operatingsystem ? {
-          /(RedHat|redhat|centos)/ =>  "https://yum.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
+          /(RedHat|redhat|CentOS|centos)/ =>  "https://yum.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
           'Amazon'          =>  "https://yum.boundary.com/centos/os/6.3/$::architecture/",
         },
         gpgcheck => 1,
