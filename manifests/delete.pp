@@ -18,12 +18,7 @@
 # limitations under the License.
 #
 
-class boundary::delete {
-
-  require boundary::params
-
-  $id             = $boundary::params::id
-  $apikey         = $boundary::params::apikey
+class boundary::delete ($id, $apikey) {
 
   boundary_meter { $::fqdn:
     ensure   => absent,

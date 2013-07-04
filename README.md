@@ -1,18 +1,22 @@
 Boundary module
 =
 
-This is the boundary module.
+This is the Boundary module.
 
 To use it:
 
-    include boundary
-
-You need need to specify your Organisation ID and API key in the boundary::params
-class (manifests/params.pp).
+    class { 'boundary':
+      id     => 'organisation_id',
+      apikey => 'apikey',
+      tags   => [ 'these', 'are', 'tags' ]
+    } 
 
 To remove a meter change your include to:
 
-    include boundary::delete
+    class { 'boundary::delete':
+      id     => 'organisation_id',
+      apikey => 'apikey',
+    }
 
 To specify a stand-alone probe you can use the `boundary_meter` resource:
 
@@ -34,17 +38,14 @@ the module add `boundary` to the list of classes. Then add the `boundary`
 class directly to a node or a group. The following dashboard parameters are
 supported:
 
-- `boundary_apikey`
-- `boundary_id`
-- `boundary_collector`
-- `boundary_collector_port`
-- `boundary_tags`
+- `apikey`
+- `id`
+- `collector`
+- `collector_port`
+- `tags`
 
-The `boundary_tags` parameter is a comma separated list of tag names to apply
-to this bprobe (e.g., 'a, list, of, tags'). Whitespace is fine. If you want to
-tag nodes indivdually you should at the `boundary` class directly to each
-node. Similarly you can tag at the group level. Currently you cannot tag at
-both the node and group level.
+The `tags` parameter is an array of tag names to apply to this bprobe
+(e.g., [ 'a', 'list', 'of', 'tags' ] ). 
 
 Report processor
 ==
@@ -81,7 +82,7 @@ The `boundary_meter` type and provider is heavily based on work by Joe Williams 
 Copyright
 ---
 
-Puppet Labs 2011-2012
+Puppet Labs 2011-2013
 
 License
 ---

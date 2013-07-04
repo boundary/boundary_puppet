@@ -17,15 +17,14 @@
 # limitations under the License.
 #
 
-class boundary {
+class boundary (
+    $id,
+    $apikey,
+    $collector = 'collector.boundary.com',
+    $collector_port = '4740',
+    $tags ) {
 
-  require boundary::params
   require boundary::dependencies
-
-  $id             = $boundary::params::id
-  $apikey         = $boundary::params::apikey
-  $collector      = $boundary::params::collector
-  $collector_port = $boundary::params::collector_port
 
   file { '/etc/bprobe/':
     ensure => directory,
@@ -74,12 +73,7 @@ class boundary {
     id      => $id,
     apikey  => $apikey,
     require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
-  }
-
-  if $boundary::params::tags {
-    Boundary_meter[$::fqdn] {
-      tags => $boundary::params::tags
-    }
+    tags    => $tags,
   }
 
   service { 'bprobe':
