@@ -22,15 +22,20 @@ class boundary (
     $apikey,
     $collector = 'collector.boundary.com',
     $collector_port = '4740',
+    $gh_user = '',
+    $gh_token = '',
     $tags ) {
 
   require boundary::dependencies
 
+  File {
+    group  => 'root',
+    owner  => 'root',
+  }
+
   file { '/etc/bprobe/':
     ensure => directory,
     mode   => '0755',
-    owner  => 'root',
-    group  => 'root',
   }
 
   package { 'bprobe':
@@ -42,8 +47,6 @@ class boundary (
     ensure  => present,
     content => template('boundary/bprobe.defaults.erb'),
     mode    => '0600',
-    owner   => 'root',
-    group   => 'root',
     notify  => Service['bprobe'],
     require => Package['bprobe'],
   }
@@ -52,8 +55,6 @@ class boundary (
     ensure  => present,
     source  => 'puppet:///modules/boundary/ca.pem',
     mode    => '0600',
-    owner   => 'root',
-    group   => 'root',
     notify  => Service['bprobe'],
     require => Package['bprobe'],
   }
@@ -62,10 +63,15 @@ class boundary (
     ensure  => present,
     source  => 'puppet:///modules/boundary/cacert.pem',
     mode    => '0600',
-    owner   => 'root',
-    group   => 'root',
     notify  => Service['bprobe'],
     require => Package['bprobe'],
+  }
+
+  boundary::resource::boundary { '/etc/puppet/boundary.yaml':
+    boundary_orgid  => "${id}",
+    boundary_apikey => "${apikey}",
+    github_user     => "${gh_user}",
+    github_token    => "${gh_token}"
   }
 
   boundary_meter { $::fqdn:
