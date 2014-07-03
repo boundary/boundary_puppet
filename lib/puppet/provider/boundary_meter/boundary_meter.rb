@@ -120,7 +120,7 @@ module Boundary
         response = http_request(:get, "#{base_url}/#{type}.pem", headers, resource)
 
         if response
-          file = "/etc/bprobe/#{type}.pem"
+          file = "/etc/boundary/#{type}.pem"
           File.open(file, 'w') {|f| f.write(response.body) }
           File.chmod(0600, file)
           File.chown(1, 1, file)
@@ -181,7 +181,7 @@ module Boundary
       end
 
       http.use_ssl = true
-      http.ca_file = "/etc/bprobe/cacert.pem"
+      http.ca_file = "/etc/boundary/cacert.pem"
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
       case method

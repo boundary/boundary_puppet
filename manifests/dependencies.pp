@@ -20,64 +20,48 @@
 
 class boundary::dependencies {
 
-  Exec {
-    path => '/usr/bin:/usr/sbin:/bin:/sbin',
+  $repo_mod = $boundary::release ? {
+    production  => '',
+    staging     => '-staging',
+    default     => '',
   }
 
   case $::operatingsystem {
     'RedHat', 'redhat', 'CentOS', 'centos', 'Amazon', 'Fedora': {
 
-      $rpmkey = '/etc/pki/rpm-gpg/RPM-GPG-KEY-Boundary'
-
-      file { $rpmkey:
-        ensure => present,
-        source => 'puppet:///modules/boundary/RPM-GPG-KEY-Boundary',
-      }
-
-      exec { 'import_key':
-        command     => "/bin/rpm --import $rpmkey",
-        subscribe   => File[$rpmkey],
-        refreshonly => true,
-      }
-
       yumrepo { 'boundary':
         descr    => "Boundary $::operatingsystemrelease $::architecture Repository ",
         enabled  => 1,
         baseurl  => $::operatingsystem ? {
-          /(RedHat|redhat|CentOS|centos)/ =>  "https://yum.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
-          'Fedora'                        =>  "https://yum.boundary.com/centos/os/6.4/$::architecture/",
-          'Amazon'                        =>  "https://yum.boundary.com/centos/os/6.4/$::architecture/",
+          /(RedHat|redhat|CentOS|centos)/ =>  "https://yum$repo_mod.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
+          'Fedora'                        =>  "https://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
+          'Amazon'                        =>  "https://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
         },
         gpgcheck => 1,
-        gpgkey   => 'https://yum.boundary.com/RPM-GPG-KEY-Boundary',
+        gpgkey   => "https://yum$repo_mod.boundary.com/RPM-GPG-KEY-Boundary",
       }
     }
 
     'debian', 'ubuntu': {
 
+      include apt
+
+      $repo = $::operatingsystem ? {
+        debian    => 'main',
+        ubuntu    => 'universe',
+        default   => undef,
+      }
+
       package { 'apt-transport-https':
         ensure => latest,
       }
 
-      file { '/etc/apt/trusted.gpg.d/boundary.gpg':
-        source => 'puppet:///modules/boundary/boundary.gpg',
-        notify => Exec['add-boundary-apt-key'],
-      }
-
-      exec { 'add-boundary-apt-key':
-        command     => 'apt-key add /etc/apt/trusted.gpg.d/boundary.gpg',
-        refreshonly => true,
-      }
-
-      file { '/etc/apt/sources.list.d/boundary.list':
-        ensure  => present,
-        content => template('boundary/apt_source.erb'),
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        require => [Package['apt-transport-https'],
-                    File['/etc/apt/trusted.gpg.d/boundary.gpg']],
-        notify  => Exec['apt-update']
+      apt::source { 'boundary':
+        location   => inline_template('<%= "https://apt#{repo_mod}.boundary.com/#{operatingsystem.downcase}" %>'),
+        repos      => $repo,
+        key        => '6532CC20',
+        key_source => 'https://apt#{repo_mod}.boundary.com/APT-GPG-KEY-Boundary',
+        notify  => Exec['apt-update'],
       }
 
       exec { 'apt-update':

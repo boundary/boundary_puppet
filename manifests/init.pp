@@ -22,9 +22,13 @@ class boundary (
     $apikey,
     $collector = 'collector.boundary.com',
     $collector_port = '4740',
-    $gh_user = '',
-    $gh_token = '',
-    $tags ) {
+    $tags = [],
+    $interfaces = [],
+    $pcap_stats = 0,
+    $pcap_promisc = 0,
+    $disable_ntp = 0,
+    $enable_stun = 0,
+    $release = 'production' ) {
 
   require boundary::dependencies
 
@@ -33,56 +37,40 @@ class boundary (
     owner  => 'root',
   }
 
-  file { '/etc/bprobe/':
-    ensure => directory,
-    mode   => '0755',
+  package { 'boundary-meter':
+    ensure  => latest
   }
 
-  package { 'bprobe':
-    ensure  => latest,
-    require => File['/etc/bprobe/'],
-  }
-
-  file { '/etc/bprobe/bprobe.defaults':
+  file { '/etc/default/boundary-meter':
     ensure  => present,
-    content => template('boundary/bprobe.defaults.erb'),
+    content => template('boundary/boundary-meter.defaults.erb'),
     mode    => '0600',
-    notify  => Service['bprobe'],
-    require => Package['bprobe'],
+    notify  => Service['boundary-meter'],
+    require => Package['boundary-meter'],
   }
 
-  file { '/etc/bprobe/ca.pem':
-    ensure  => present,
-    source  => 'puppet:///modules/boundary/ca.pem',
-    mode    => '0600',
-    notify  => Service['bprobe'],
-    require => Package['bprobe'],
-  }
-
-  file { '/etc/bprobe/cacert.pem':
+  file { '/etc/boundary/cacert.pem':
     ensure  => present,
     source  => 'puppet:///modules/boundary/cacert.pem',
     mode    => '0600',
-    notify  => Service['bprobe'],
-    require => Package['bprobe'],
+    require => Package['boundary-meter'],
   }
 
   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
     boundary_orgid  => "${id}",
-    boundary_apikey => "${apikey}",
-    github_user     => "${gh_user}",
-    github_token    => "${gh_token}"
+    boundary_apikey => "${apikey}"
   }
 
   boundary_meter { $::fqdn:
     ensure  => present,
     id      => $id,
     apikey  => $apikey,
-    require => [ Package['bprobe'], File['/etc/bprobe/cacert.pem'] ],
     tags    => $tags,
+    require => [ Package['boundary-meter'], File['/etc/boundary/cacert.pem'] ],
+    notify => Service['boundary-meter'],
   }
 
-  service { 'bprobe':
+  service { 'boundary-meter':
     ensure    => running,
     enable    => true,
     hasstatus => false,

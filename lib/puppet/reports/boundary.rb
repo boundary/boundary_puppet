@@ -12,7 +12,7 @@ end
 Puppet::Reports.register_report(:boundary) do
 
   desc <<-DESC
-  Send notification Puppet runs as Boundary annotations.
+  Send notification Puppet runs as Boundary events.
   DESC
 
   @configfile = File.join([File.dirname(Puppet.settings[:config]), "boundary.yaml"])
@@ -34,7 +34,7 @@ Puppet::Reports.register_report(:boundary) do
         severity = "INFO"
       end
 
-      create_event(title, tags,status, severity ,self.host,self.time)
+      create_event(title, tags,status, severity , self.host)
     end
   else
     Puppet.debug "Boundary annotations disabled"
@@ -43,7 +43,7 @@ Puppet::Reports.register_report(:boundary) do
     end
   end
 
-  def create_event( title, tags, status, severity, host,time)
+  def create_event( title, tags, status, severity, host)
     auth = auth_encode("#{BOUNDARY_API}:")
     headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
     fingerprints=["@title"]
@@ -55,9 +55,7 @@ Puppet::Reports.register_report(:boundary) do
       :fingerprintFields => fingerprints,
       :tags => tags,
       :title => title ,
-      :message => host,
-      :createdAt => time.to_i
-
+      :message => host
     }
 
     event_pson = event.to_pson

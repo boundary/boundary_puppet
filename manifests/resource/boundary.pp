@@ -7,9 +7,7 @@
 #
 #   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
 #     boundary_orgid  => "${id}",
-#     boundary_apikey => "${apikey}",
-#     github_user     => "${gh_user}",
-#     github_token    => "${gh_token}"
+#     boundary_apikey => "${apikey}"
 #   }
 #
 # Copyright 2011, Puppet Labs
@@ -27,11 +25,9 @@
 # limitations under the License.
 #
 define boundary::resource::boundary(
-  $ensure          = 'present',
-  $boundary_orgid,
-  $boundary_apikey,
-  $github_user,
-  $github_token
+    $ensure          = 'present',
+    $boundary_orgid,
+    $boundary_apikey
   ) {
 
   File {

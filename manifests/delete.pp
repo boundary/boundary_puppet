@@ -26,19 +26,13 @@ class boundary::delete ($id, $apikey) {
     apikey   => $apikey,
   }
 
-  file { '/etc/bprobe/':
-    ensure  => absent,
-    recurse => true,
-    force   => true,
-  }
-
-  service { 'bprobe':
+  service { 'boundary-meter':
     ensure => stopped,
     enable => false,
   }
 
-  package { 'bprobe':
-    ensure => absent,
-    notify => [ File['/etc/bprobe'], Service['bprobe'] ],
+  package { 'boundary-meter':
+    ensure => purged,
+    notify => Service['boundary-meter'],
   }
 }

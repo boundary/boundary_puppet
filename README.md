@@ -30,6 +30,13 @@ To specify a stand-alone probe you can use the `boundary_meter` resource:
 You can also use the `proxy_addr` and `proxy_port` options to specify a
 proxy server if required.
 
+Requirements
+==
+
+APT based distros will require the puppetlabs-apt module which requires wget. This
+has not been added as dependency because yum based distros shouldn't have to install
+and apt module.
+
 Dashboard Support
 ==
 
@@ -83,6 +90,7 @@ Copyright
 ---
 
 Puppet Labs 2011-2013
+Boundary 2014
 
 License
 ---
