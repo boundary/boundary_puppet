@@ -90,6 +90,7 @@ Copyright
 ---
 
 Puppet Labs 2011-2013
+
 Boundary 2014
 
 License
