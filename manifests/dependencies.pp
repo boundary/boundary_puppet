@@ -33,12 +33,12 @@ class boundary::dependencies {
         descr    => "Boundary $::operatingsystemrelease $::architecture Repository ",
         enabled  => 1,
         baseurl  => $::operatingsystem ? {
-          /(RedHat|redhat|CentOS|centos)/ =>  "https://yum$repo_mod.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
-          'Fedora'                        =>  "https://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
-          'Amazon'                        =>  "https://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
+          /(RedHat|redhat|CentOS|centos)/ =>  "http://yum$repo_mod.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
+          'Fedora'                        =>  "http://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
+          'Amazon'                        =>  "http://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
         },
         gpgcheck => 1,
-        gpgkey   => "https://yum$repo_mod.boundary.com/RPM-GPG-KEY-Boundary",
+        gpgkey   => "http://yum$repo_mod.boundary.com/RPM-GPG-KEY-Boundary",
       }
     }
 
@@ -52,15 +52,11 @@ class boundary::dependencies {
         default   => undef,
       }
 
-      package { 'apt-transport-https':
-        ensure => latest,
-      }
-
       apt::source { 'boundary':
-        location   => inline_template('<%= "https://apt#{repo_mod}.boundary.com/#{operatingsystem.downcase}" %>'),
+        location   => inline_template('<%= "http://apt#{repo_mod}.boundary.com/#{operatingsystem.downcase}" %>'),
         repos      => $repo,
         key        => '6532CC20',
-        key_source => 'https://apt#{repo_mod}.boundary.com/APT-GPG-KEY-Boundary',
+        key_source => 'http://apt#{repo_mod}.boundary.com/APT-GPG-KEY-Boundary',
         notify  => Exec['apt-update'],
       }
 
