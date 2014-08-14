@@ -35,7 +35,7 @@ Requirements
 
 APT based distros will require the puppetlabs-apt module which requires wget. This
 has not been added as dependency because yum based distros shouldn't have to install
-and apt module.
+an apt module.
 
 Dashboard Support
 ==
