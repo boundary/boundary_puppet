@@ -49,13 +49,6 @@ class boundary (
     require => Package['boundary-meter'],
   }
 
-  file { '/etc/boundary/cacert.pem':
-    ensure  => present,
-    source  => 'puppet:///modules/boundary/cacert.pem',
-    mode    => '0600',
-    require => Package['boundary-meter'],
-  }
-
   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
     boundary_orgid  => "${id}",
     boundary_apikey => "${apikey}"
@@ -66,7 +59,7 @@ class boundary (
     id      => $id,
     apikey  => $apikey,
     tags    => $tags,
-    require => [ Package['boundary-meter'], File['/etc/boundary/cacert.pem'] ],
+    require => Package['boundary-meter'],
     notify => Service['boundary-meter'],
   }
 

@@ -1,10 +1,9 @@
 #
-# Author:: Jomes Turnbull <james@puppetlabs.com>
-# Boundary API and code heavily stolen from Joe Williams (<j@boundary.com>)
+# Author:: Zachary Schneider (<schneider@boundary.com>)
 # Type Name:: boundary_meter
 # Provider:: boundary_meter
 #
-# Copyright 2011, Puppet Labs
+# Copyright 2014, Boundary
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,218 +18,97 @@
 # limitations under the License.
 #
 
-require "uri"
-require "net/https"
-require "base64"
+#resource[:blah]
+
+require 'json'
 
 module Boundary
-  module API
+  module Meter
 
-    API_HOST = "api.boundary.com"
-
-    def auth_encode(resource)
-      auth = Base64.encode64("#{resource[:apikey]}:").strip
-      auth.gsub("\n","")
-    end
-
-    def generate_headers(resource)
-      auth = auth_encode(resource)
-      { "Authorization" => "Basic #{auth}", "Content-Type" => "application/json" }
-    end
-
-    def build_url(resource, action)
-      case action
-      when :create
-        "https://#{API_HOST}/#{resource[:id]}/meters"
-      when :search
-        "https://#{API_HOST}/#{resource[:id]}/meters?name=#{resource[:name]}"
-      when :certificates
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}"
-      when :tags
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}/tags"
-      when :delete
-        "https://#{API_HOST}/#{resource[:id]}/meters/#{@meter_id}"
-      end
-    end
+    CONF_DIR = '/etc/boundary'
 
     def create_meter(resource)
       begin
-        url = build_url(resource, :create)
-        headers = generate_headers(resource)
-        body = {:name => resource[:name]}.to_pson
-
-        Puppet.info("Creating meter #{resource[:name]}")
-        response = http_request(:post, url, headers, resource, body)
-
-        body = PSON.parse(response.body)
-        @meter_id = body["id"]
-        @tags = body["tags"]
-        download_request("key", resource)
-        download_request("cert", resource)
-        if resource[:tags]
-          set_meter_tags(resource)
-        end
+        run_command(build_command(resource, :create))
       rescue Exception => e
-          raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
       end
     end
 
     def delete_meter(resource)
       begin
-        url = build_url(resource, :delete)
-        headers = generate_headers(resource)
-
-        Puppet.info("Deleting meter #{resource[:name]}")
-        response = http_request(:delete, url, headers, resource)
+        run_command(build_command(resource, :delete))
       rescue Exception => e
         raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
       end
     end
 
-    def get_meter(data, resource)
+    def get_meter(resource)
       begin
-        url = build_url(resource, :search)
-        headers = generate_headers(resource)
-        response = http_request(:get, url, headers, resource)
-
-        if response
-          body = PSON.parse(response.body)
-          if body[0]
-            if body[0]["#{data}"]
-              body[0]["#{data}"]
-            else
-              raise Puppet::Error, "Could not get meter #{data} (nil response)!"
-            end
-          else
-            return false
-          end
-        else
-          raise Puppet::Error, "Could not get meter (nil response)!"
-        end
+        return JSON.parse(run_command(build_command(resource, :json)))
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter #{data}, failed with #{e}"
+        raise Puppet::Error, "Could not get meter #{resource[:name]}, failed with #{e}"
         nil
-      end
-    end
-
-    def download_request(type, resource)
-      begin
-        base_url = build_url(resource, :certificates)
-        headers = generate_headers(resource)
-        response = http_request(:get, "#{base_url}/#{type}.pem", headers, resource)
-
-        if response
-          file = "/etc/boundary/#{type}.pem"
-          File.open(file, 'w') {|f| f.write(response.body) }
-          File.chmod(0600, file)
-          File.chown(1, 1, file)
-        else
-          raise Puppet::Error, "Could not download #{type} (nil response)!"
-        end
-      rescue Exception => e
-        raise Puppet::Error, "Could not download #{type}, failed with #{e}"
       end
     end
 
     def set_meter_tags(resource)
-      new_tags = resource[:tags]
-      new_tags.each do |t|
-        unless tags.include?(t)
-          add_meter_tag(t, resource)
-        end
-      end
-      old_tags = tags - new_tags
-      old_tags.each do |t|
-        remove_meter_tag(t, resource)
-      end
-    end
-
-    def add_meter_tag(tag, resource)
       begin
-        url = build_url(resource, :tags)
-        headers = generate_headers(resource)
-
-        http_request(:put, "#{url}/#{tag}", headers, resource, "")
+        # Remove all tags
+        run_command(build_command(resource, :delete_tags))
+        # Add new tags
+        run_command(build_command(resource, nil))
       rescue Exception => e
-        raise Puppet::Error, "Could not add meter tag: #{tag}, failed with #{e}"
-      end
-    end
-
-    def remove_meter_tag(tag, resource)
-      begin
-        url = build_url(resource, :tags)
-        headers = generate_headers(resource)
-
-        http_request(:delete, "#{url}/#{tag}", headers, resource, "")
-      rescue Exception => e
-          raise Puppet::Error, "Could not remove meter tag: #{tag}, failed with #{e}"
-      end
-    end
-
-    def http_request(method, url, headers, resource, body=nil)
-      Puppet.debug("Url: #{url}")
-      Puppet.debug("Headers: #{headers.to_hash.inspect}")
-      Puppet.debug("Body: #{body}")
-
-      uri = URI(url)
-
-      if resource[:proxy_addr] && resource[:proxy_port]
-        http = Net::HTTP.new(uri.host, uri.port, resource[:proxy_addr], resource[:proxy_port])
-      else
-        http = Net::HTTP.new(uri.host, uri.port)
-      end
-
-      http.use_ssl = true
-      http.ca_file = "/etc/boundary/cacert.pem"
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-
-      case method
-      when :get
-        req = Net::HTTP::Get.new(uri.request_uri)
-      when :post
-        req = Net::HTTP::Post.new(uri.request_uri)
-        req.body = body
-      when :put
-        req = Net::HTTP::Put.new(uri.request_uri)
-        req.body = body
-      when :delete
-        req = Net::HTTP::Delete.new(uri.request_uri)
-      else
-        raise Puppet::Error, "Unsupported http method (nil response)!"
+        raise Puppet::Error, "Could not set meter tags #{resource[:tags]}, failed with #{e}"
         nil
       end
+    end
 
-      headers.each{|k,v|
-        req[k] = v
-      }
-      response = http.request(req)
-
-      Puppet.debug("Response Body: #{response.body}")
-      Puppet.debug("Status: #{response.code}")
-
-      if bad_response?(method, url, response)
+    def get_meter_tags(resource)
+      begin
+        return run_command(build_command(resource, :tags)).chomp.split(',')
+      rescue Exception => e
+        raise Puppet::Error, "Could not get meter tags for #{resource[:name]}, failed with #{e}"
         nil
-      else
-        response
       end
     end
 
-    def bad_response?(method, url, response)
-      case response
-      when Net::HTTPSuccess
-        false
-      else
-        true
-        raise Puppet::Error, "Got a #{response.code} for #{method} to #{url}"
-        true
+    # Internal Methods
+
+    def build_command(resource, action)
+      command = [
+        "boundary-meter",
+        "-p #{resource[:id]}:#{resource[:apikey]}",
+        "-b #{Boundary::Meter::CONF_DIR}",
+        "--nodename #{resource[:name]}"
+      ]
+
+      command.push "-l #{action.to_s}" unless action == nil
+
+      if action == :create or action == nil
+        command.push "--tag #{resource[:tags].join(',')}" unless resource[:tags] == []
       end
+
+      return command.join(' ')
+    end
+
+    def run_command(command)
+      # For some reason puppet calls create if tags change
+      # short circuiting this here for now
+      return unless command.include?('-l') || command.include?('--tag')
+
+      result = `#{command}`
+
+      raise Exception.new("Command Failed") unless $?.to_i == 0
+
+      return result
     end
   end
 end
 
 Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
 
-  include Boundary::API
+  include Boundary::Meter
 
   desc "Manage Boundary meters."
 
@@ -245,8 +123,9 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def exists?
-    @meter_id = get_meter("id", resource)
-    if @meter_id
+    meter = get_meter(resource)
+
+    if meter['id'] and meter['connected'] == 'true'
       true
     else
       false
@@ -262,7 +141,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
   end
 
   def tags
-    @tags ||= get_meter("tags", resource)
+    @tags ||= get_meter_tags(resource)
   end
 
   def tags=(tags)
