@@ -33,6 +33,6 @@ class boundary::delete ($id, $apikey) {
 
   package { 'boundary-meter':
     ensure => purged,
-    notify => Service['boundary-meter'],
+    require => Service['boundary-meter']
   }
 }
