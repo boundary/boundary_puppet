@@ -79,9 +79,10 @@ Puppet runs that had changes or failed. To use it:
 
 4.  Run the Puppet client and sync the report as a plugin
 
-Author
+Authors
 ---
 
+Zachary Schneider <ops@boundary.com>
 James Turnbull <james@puppetlabs.com>
 
 The `boundary_meter` type and provider is heavily based on work by Joe Williams and Ben Black from Boundary.
