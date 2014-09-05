@@ -1,5 +1,5 @@
 name    'boundary-boundary'
-version '3.0.2'
+version '3.0.3'
 source 'https://github.com/boundary/boundary_puppet'
 author 'boundary'
 license 'Apache 2.0'

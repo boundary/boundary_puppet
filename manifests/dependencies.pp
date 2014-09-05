@@ -56,13 +56,7 @@ class boundary::dependencies {
         location   => inline_template('<%= "http://apt#{repo_mod}.boundary.com/#{operatingsystem.downcase}" %>'),
         repos      => $repo,
         key        => '6532CC20',
-        key_source => 'http://apt#{repo_mod}.boundary.com/APT-GPG-KEY-Boundary',
-        notify  => Exec['apt-update'],
-      }
-
-      exec { 'apt-update':
-        command     => '/usr/bin/apt-get update',
-        refreshonly => true,
+        key_source => 'http://apt#{repo_mod}.boundary.com/APT-GPG-KEY-Boundary'
       }
     }
 
