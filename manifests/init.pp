@@ -20,14 +20,7 @@
 class boundary (
     $id,
     $apikey,
-    $collector = 'collector.boundary.com',
-    $collector_port = '4740',
     $tags = [],
-    $interfaces = [],
-    $pcap_stats = 0,
-    $pcap_promisc = 0,
-    $disable_ntp = 0,
-    $enable_stun = 0,
     $release = 'production' ) {
 
   require boundary::dependencies
@@ -39,14 +32,6 @@ class boundary (
 
   package { 'boundary-meter':
     ensure  => latest
-  }
-
-  file { '/etc/default/boundary-meter':
-    ensure  => present,
-    content => template('boundary/boundary-meter.defaults.erb'),
-    mode    => '0600',
-    notify  => Service['boundary-meter'],
-    require => Package['boundary-meter'],
   }
 
   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
