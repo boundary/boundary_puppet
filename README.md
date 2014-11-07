@@ -3,31 +3,39 @@ Boundary module
 
 This is the Boundary module.
 
-To use it:
+To use it with Boundary Premium:
 
     class { 'boundary':
-      id     => 'organisation_id',
-      apikey => 'apikey',
+      tokens => ['api_token']
+	}
+
+To use it with Boundary Enterprise:
+
+    class { 'boundary':
+      tokens => ['org_id:api_key'],
       tags   => [ 'these', 'are', 'tags' ]
-    } 
+    }
+
+Or, as of Boundary Meter 3.1, you can use it with both at the same time:
+
+    class { 'boundary':
+      tokens => ['api_token', 'org_id:api_key'],
+      tags   => [ 'these', 'are', 'tags' ]
+    }
 
 To remove a meter change your include to:
 
-    class { 'boundary::delete':
-      id     => 'organisation_id',
-      apikey => 'apikey',
-    }
+    class { 'boundary::delete' }
 
-To specify a stand-alone probe you can use the `boundary_meter` resource:
+To specify a stand-alone meter you can use the `boundary_meter` resource:
 
-    boundary_meter { "nameofprobe":
+    boundary_meter { "name_of_meter":
       ensure  => present,
-      id      => '1234556789',
-      apikey  => 'abcdef123456',
+      tokens => ['api_token'],
       tags    => [ "production", "web", "cluster" ],
     }
 
-You can also use the `proxy_addr` and `proxy_port` options to specify a
+You can also use the `proxy_addr` and `proxy_port` options to specify an HTTPS
 proxy server if required.
 
 Requirements
@@ -45,39 +53,11 @@ the module add `boundary` to the list of classes. Then add the `boundary`
 class directly to a node or a group. The following dashboard parameters are
 supported:
 
-- `apikey`
-- `id`
-- `collector`
-- `collector_port`
+- `tokens`
 - `tags`
 
-The `tags` parameter is an array of tag names to apply to this bprobe
-(e.g., [ 'a', 'list', 'of', 'tags' ] ). 
-
-Report processor
-==
-
-The module also contains a report processor that can send the results of
-Puppet runs as Boundary annotations. Reports will only be created for
-Puppet runs that had changes or failed. To use it:
-
-1.  Install puppet-boundary as a module in your Puppet master's module
-    path.
-
-2.  Update the `boundary_orgid` and `boundary_apikey` variables in the `boundary.yaml`
-    file with your Boundary connection details.
-
-3.  Enable pluginsync and reports on your master and clients in `puppet.conf`
-
-        [master]
-        report = true
-        reports = boundary
-        pluginsync = true
-        [agent]
-        report = true
-        pluginsync = true
-
-4.  Run the Puppet client and sync the report as a plugin
+The `tags` parameter is an array of tag names to apply to this meter
+(e.g., [ 'a', 'list', 'of', 'tags' ] ).
 
 Authors
 ---

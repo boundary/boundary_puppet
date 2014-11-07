@@ -18,8 +18,6 @@
 # limitations under the License.
 #
 
-#resource[:blah]
-
 require 'json'
 
 module Boundary
