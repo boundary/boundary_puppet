@@ -78,10 +78,10 @@ module Boundary
         "boundary-meter",
         "-p #{resource[:id]}:#{resource[:apikey]}",
         "-b #{Boundary::Meter::CONF_DIR}",
-        "--nodename #{resource[:name]}"
       ]
 
       command.push "-l #{action.to_s}" unless action == nil
+	  command.push "--nodename #{resource[:name]}" unless resource[:name] == "undef"
 
       if action == :create or action == nil
         command.push "--tag #{resource[:tags].join(',')}" unless resource[:tags] == []
@@ -97,7 +97,7 @@ module Boundary
 
       result = `#{command}`
 
-      raise Exception.new("Command Failed") unless $?.to_i == 0
+      raise Exception.new("command '#{command}' failed") unless $?.to_i == 0
 
       return result
     end
