@@ -18,8 +18,7 @@
 #
 
 class boundary (
-    $id,
-    $apikey,
+    $token,
     $tags = [],
     $release = 'production' ) {
 
@@ -35,14 +34,12 @@ class boundary (
   }
 
   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-    boundary_orgid  => "${id}",
-    boundary_apikey => "${apikey}"
+    boundary_token => "${token}"
   }
 
   boundary_meter { $::fqdn:
     ensure  => present,
-    id      => $id,
-    apikey  => $apikey,
+    token  => $token,
     tags    => $tags,
     require => Package['boundary-meter'],
     notify => Service['boundary-meter'],

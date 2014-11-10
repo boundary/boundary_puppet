@@ -6,20 +6,20 @@ This is the Boundary module.
 To use it with Boundary Premium:
 
     class { 'boundary':
-      tokens => ['api_token']
+      token => 'api_token'
 	}
 
 To use it with Boundary Enterprise:
 
     class { 'boundary':
-      tokens => ['org_id:api_key'],
+      tokens => 'org_id:api_key',
       tags   => [ 'these', 'are', 'tags' ]
     }
 
 Or, as of Boundary Meter 3.1, you can use it with both at the same time:
 
     class { 'boundary':
-      tokens => ['api_token', 'org_id:api_key'],
+      tokens => 'api_token,org_id:api_key',
       tags   => [ 'these', 'are', 'tags' ]
     }
 

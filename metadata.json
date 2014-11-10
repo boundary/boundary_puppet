@@ -29,12 +29,8 @@
           "doc": "Boundary meter installation tokens."
         },
         {
-          "name": "id",
-          "doc": "Boundary Enterprise ORG ID (deprecated)."
-        },
-        {
-          "name": "apikey",
-          "doc": "Boundary Enterprise API key (deprecated)."
+          "name": "token",
+          "doc": "Boundary Installation Token (this can be a comma-separated array of tokens for Enterprise and Premium)."
         }
       ],
       "properties": [

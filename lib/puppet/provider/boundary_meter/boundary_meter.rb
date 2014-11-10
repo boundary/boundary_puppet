@@ -76,7 +76,7 @@ module Boundary
     def build_command(resource, action)
       command = [
         "boundary-meter",
-        "-p #{resource[:id]}:#{resource[:apikey]}",
+        "-p #{resource[:token]}",
         "-b #{Boundary::Meter::CONF_DIR}",
       ]
 
