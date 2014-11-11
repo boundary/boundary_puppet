@@ -7,20 +7,20 @@ To use it with Boundary Premium:
 
     class { 'boundary':
       token => 'api_token'
-	}
+    }
 
 To use it with Boundary Enterprise:
 
     class { 'boundary':
-      tokens => 'org_id:api_key',
-      tags   => [ 'these', 'are', 'tags' ]
+      token => 'org_id:api_key',
+      tags  => [ 'these', 'are', 'tags' ]
     }
 
 Or, as of Boundary Meter 3.1, you can use it with both at the same time:
 
     class { 'boundary':
-      tokens => 'api_token,org_id:api_key',
-      tags   => [ 'these', 'are', 'tags' ]
+      token => 'api_token,org_id:api_key',
+      tags  => [ 'these', 'are', 'tags' ]
     }
 
 To remove a meter change your include to:
@@ -30,9 +30,9 @@ To remove a meter change your include to:
 To specify a stand-alone meter you can use the `boundary_meter` resource:
 
     boundary_meter { "name_of_meter":
-      ensure  => present,
-      tokens => ['api_token'],
-      tags    => [ "production", "web", "cluster" ],
+      ensure => present,
+      token  => ['api_token'],
+      tags   => [ "production", "web", "cluster" ],
     }
 
 You can also use the `proxy_addr` and `proxy_port` options to specify an HTTPS
@@ -53,7 +53,7 @@ the module add `boundary` to the list of classes. Then add the `boundary`
 class directly to a node or a group. The following dashboard parameters are
 supported:
 
-- `tokens`
+- `token`
 - `tags`
 
 The `tags` parameter is an array of tag names to apply to this meter
