@@ -29,7 +29,7 @@ module Boundary
       begin
         run_command(build_command(resource, :create))
       rescue Exception => e
-        raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not create meter, failed with #{e}"
       end
     end
 
@@ -37,7 +37,7 @@ module Boundary
       begin
         run_command(build_command(resource, :delete))
       rescue Exception => e
-        raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not delete meter, failed with #{e}"
       end
     end
 
@@ -45,7 +45,7 @@ module Boundary
       begin
         return JSON.parse(run_command(build_command(resource, :json)))
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not get meter, failed with #{e}"
         nil
       end
     end
@@ -57,7 +57,7 @@ module Boundary
         # Add new tags
         run_command(build_command(resource, nil))
       rescue Exception => e
-        raise Puppet::Error, "Could not set meter tags #{resource[:tags]}, failed with #{e}"
+        raise Puppet::Error, "Could not set meter tags, failed with #{e}"
         nil
       end
     end
@@ -66,7 +66,7 @@ module Boundary
       begin
         return run_command(build_command(resource, :tags)).chomp.split(',')
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter tags for #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not get meter tags, failed with #{e}"
         nil
       end
     end
@@ -116,7 +116,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
     begin
       create_meter(resource)
     rescue Exception => e
-      raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+      raise Puppet::Error, "Could not create meter, failed with #{e}"
     end
   end
 
@@ -134,7 +134,7 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
     begin
       delete_meter(resource)
     rescue Exception => e
-      raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
+      raise Puppet::Error, "Could not delete meter, failed with #{e}"
     end
   end
 
