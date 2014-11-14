@@ -122,12 +122,8 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
 
   def exists?
     meter = get_meter(resource)
-
-    if meter['id'] and meter['connected'] == 'true'
-      true
-    else
-      false
-    end
+    (meter['id'] and meter['connected'] == 'true') or \
+        (meter['premium'] and meter['premium']['projectId'])
   end
 
   def destroy
