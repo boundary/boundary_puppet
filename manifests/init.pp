@@ -18,16 +18,8 @@
 #
 
 class boundary (
-    $id,
-    $apikey,
-    $collector = 'collector.boundary.com',
-    $collector_port = '4740',
+    $token,
     $tags = [],
-    $interfaces = [],
-    $pcap_stats = 0,
-    $pcap_promisc = 0,
-    $disable_ntp = 0,
-    $enable_stun = 0,
     $release = 'production' ) {
 
   require boundary::dependencies
@@ -41,23 +33,13 @@ class boundary (
     ensure  => latest
   }
 
-  file { '/etc/default/boundary-meter':
-    ensure  => present,
-    content => template('boundary/boundary-meter.defaults.erb'),
-    mode    => '0600',
-    notify  => Service['boundary-meter'],
-    require => Package['boundary-meter'],
-  }
-
   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-    boundary_orgid  => "${id}",
-    boundary_apikey => "${apikey}"
+    boundary_token => "${token}"
   }
 
   boundary_meter { $::fqdn:
     ensure  => present,
-    id      => $id,
-    apikey  => $apikey,
+    token  => $token,
     tags    => $tags,
     require => Package['boundary-meter'],
     notify => Service['boundary-meter'],

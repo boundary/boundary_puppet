@@ -18,8 +18,6 @@
 # limitations under the License.
 #
 
-#resource[:blah]
-
 require 'json'
 
 module Boundary
@@ -31,7 +29,7 @@ module Boundary
       begin
         run_command(build_command(resource, :create))
       rescue Exception => e
-        raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not create meter, failed with #{e}"
       end
     end
 
@@ -39,7 +37,7 @@ module Boundary
       begin
         run_command(build_command(resource, :delete))
       rescue Exception => e
-        raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not delete meter, failed with #{e}"
       end
     end
 
@@ -47,7 +45,7 @@ module Boundary
       begin
         return JSON.parse(run_command(build_command(resource, :json)))
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not get meter, failed with #{e}"
         nil
       end
     end
@@ -59,7 +57,7 @@ module Boundary
         # Add new tags
         run_command(build_command(resource, nil))
       rescue Exception => e
-        raise Puppet::Error, "Could not set meter tags #{resource[:tags]}, failed with #{e}"
+        raise Puppet::Error, "Could not set meter tags, failed with #{e}"
         nil
       end
     end
@@ -68,7 +66,7 @@ module Boundary
       begin
         return run_command(build_command(resource, :tags)).chomp.split(',')
       rescue Exception => e
-        raise Puppet::Error, "Could not get meter tags for #{resource[:name]}, failed with #{e}"
+        raise Puppet::Error, "Could not get meter tags, failed with #{e}"
         nil
       end
     end
@@ -78,12 +76,12 @@ module Boundary
     def build_command(resource, action)
       command = [
         "boundary-meter",
-        "-p #{resource[:id]}:#{resource[:apikey]}",
+        "-p #{resource[:token]}",
         "-b #{Boundary::Meter::CONF_DIR}",
-        "--nodename #{resource[:name]}"
       ]
 
       command.push "-l #{action.to_s}" unless action == nil
+	  command.push "--nodename #{resource[:name]}" unless resource[:name] == "undef"
 
       if action == :create or action == nil
         command.push "--tag #{resource[:tags].join(',')}" unless resource[:tags] == []
@@ -99,7 +97,7 @@ module Boundary
 
       result = `#{command}`
 
-      raise Exception.new("Command Failed") unless $?.to_i == 0
+      raise Exception.new("command '#{command}' failed") unless $?.to_i == 0
 
       return result
     end
@@ -118,25 +116,21 @@ Puppet::Type.type(:boundary_meter).provide(:boundary_meter) do
     begin
       create_meter(resource)
     rescue Exception => e
-      raise Puppet::Error, "Could not create meter #{resource[:name]}, failed with #{e}"
+      raise Puppet::Error, "Could not create meter, failed with #{e}"
     end
   end
 
   def exists?
     meter = get_meter(resource)
-
-    if meter['id'] and meter['connected'] == 'true'
-      true
-    else
-      false
-    end
+    (meter['id'] and meter['connected'] == 'true') or \
+        (meter['premium'] and meter['premium']['projectId'])
   end
 
   def destroy
     begin
       delete_meter(resource)
     rescue Exception => e
-      raise Puppet::Error, "Could not delete meter #{resource[:name]}, failed with #{e}"
+      raise Puppet::Error, "Could not delete meter, failed with #{e}"
     end
   end
 

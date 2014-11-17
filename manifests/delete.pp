@@ -18,12 +18,11 @@
 # limitations under the License.
 #
 
-class boundary::delete ($id, $apikey) {
+class boundary::delete ($id, $token) {
 
   boundary_meter { $::fqdn:
     ensure   => absent,
-    id       => $id,
-    apikey   => $apikey,
+    token   => $token,
   }
 
   service { 'boundary-meter':

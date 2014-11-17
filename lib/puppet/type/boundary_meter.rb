@@ -8,12 +8,8 @@ Puppet::Type.newtype(:boundary_meter) do
     desc "The Boundary meter name."
   end
 
-  newparam(:id) do
-    desc "Your Boundary Organisation ID."
-  end
-
-  newparam(:apikey) do
-    desc "The Boundary API key."
+  newparam(:token) do
+    desc "The Boundary Installation Token."
   end
 
   newproperty(:tags, :array_matching => :all) do
