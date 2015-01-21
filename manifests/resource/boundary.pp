@@ -6,8 +6,7 @@
 # USAGE:
 #
 #   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-#     boundary_orgid  => "${id}",
-#     boundary_apikey => "${apikey}"
+#     boundary_token => "${token}"
 #   }
 #
 # Copyright 2011, Puppet Labs
@@ -26,8 +25,7 @@
 #
 define boundary::resource::boundary(
     $ensure          = 'present',
-    $boundary_orgid,
-    $boundary_apikey
+    $boundary_token
   ) {
 
   File {

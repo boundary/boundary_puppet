@@ -2,7 +2,7 @@
   "name": "boundary-boundary",
   "version": "3.1.0",
   "author": "boundary",
-  "summary": "Boundary meter module and event report handler",
+  "summary": "Boundary meter module",
   "license": "Apache 2.0",
   "source": "https://github.com/boundary/boundary_puppet",
   "types": [
@@ -25,12 +25,12 @@
           "doc": "The Boundary meter name"
         },
         {
-          "name": "username",
-          "doc": "The Boundary user name."
+          "name": "tokens",
+          "doc": "Boundary meter installation tokens."
         },
         {
-          "name": "apikey",
-          "doc": "The Boundary API key."
+          "name": "token",
+          "doc": "Boundary Installation Token (this can be a comma-separated array of tokens for Enterprise and Premium)."
         }
       ],
       "properties": [
@@ -42,9 +42,9 @@
     }
   ],
   "issues_url": "https://github.com/boundary/boundary_puppet/issues",
-  "description": "A module to install Boundary meters and report to event handler.",
+  "description": "A module to install Boundary meters.",
   "project_page": "https://github.com/boundary/boundary_puppet",
   "dependencies": [
-  
+
   ]
 }
