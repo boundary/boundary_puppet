@@ -23,7 +23,6 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -47,7 +46,6 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -71,7 +69,6 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -96,7 +93,6 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -122,7 +118,6 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
