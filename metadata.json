@@ -1,6 +1,6 @@
 {
   "name": "boundary-boundary",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": "boundary",
   "summary": "Boundary meter module",
   "license": "Apache 2.0",
@@ -45,6 +45,6 @@
   "description": "A module to install Boundary meters.",
   "project_page": "https://github.com/boundary/boundary_puppet",
   "dependencies": [
-
+    { "name":"puppetlabs/stdlib", "version_requirement":">= 2.4.0 < 5.0.0" }
   ]
 }
