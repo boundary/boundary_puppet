@@ -28,20 +28,12 @@ define boundary::resource::yaml (
   $ensure          = 'present',
   ) {
 
-  File {
+  file { $title :
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-  }
-
-## Shared Variables
-  $ensure_real = $ensure ? {
-    'absent' => absent,
-    default  => file,
-  }
-
-  file { $name:
-    ensure  => $ensure_real,
+    ensure => $ensure,
     content => template('boundary/boundary.yaml.erb')
   }
+
 }
