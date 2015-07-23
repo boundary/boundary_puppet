@@ -71,6 +71,24 @@ supported:
 The `tags` parameter is an array of tag names to apply to this meter
 (e.g., [ 'a', 'list', 'of', 'tags' ] ).
 
+Testing
+---
+
+Basic Testing has been included for Debian 8, Ubuntu 12.04, Ubuntu 14.04, RHEL 7, and CentOS 7.
+
+This is largely based on the efforts of puppet-rspec.
+
+You will need to install bundler so that you can install the test dependencies, this can be done via:
+- `gem install bundler`
+- `bundle install`
+
+This should install requirements.
+
+You can run `rake spec` to run the current test set.  
+This also includes a lint task that can run puppet-lint `rake lint`
+If want to see everything possible, run `rake help`
+
+
 Authors
 ---
 
