@@ -1,8 +1,0 @@
-name    'boundary-boundary'
-version '3.1.0'
-source 'https://github.com/boundary/boundary_puppet'
-author 'boundary'
-license 'Apache 2.0'
-summary 'Boundary meter module'
-description 'A module to install Boundary meters.'
-project_page 'https://github.com/boundary/boundary_puppet'
