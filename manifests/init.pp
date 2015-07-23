@@ -33,7 +33,7 @@ class boundary (
     ensure  => latest
   }
 
-  boundary::resource::yaml { '/etc/puppet/boundary.yaml':
+  boundary::resource::yaml { '/etc/boundary/boundary.yaml':
     boundary_token => $token
   }
 
