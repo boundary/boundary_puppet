@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rspec-puppet'
 
 describe 'boundary', :type => 'class' do
 
@@ -14,6 +15,15 @@ describe 'boundary', :type => 'class' do
     let(:params) { {:token => 'api-123456',} }
 
     it 'should compile' do should create_class('boundary') end
+    it { should contain_class('boundary::dependencies') }
+
+    it { should contain_service('boundary-meter').with(
+                    'ensure' => 'running',
+                    'enable' => true,
+                    'hasstatus' => false,
+                )
+    }
+    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -29,6 +39,15 @@ describe 'boundary', :type => 'class' do
     let(:params) { {:token => 'api-123456',} }
 
     it 'should compile' do should create_class('boundary') end
+    it { should contain_class('boundary::dependencies') }
+
+    it { should contain_service('boundary-meter').with(
+                    'ensure' => 'running',
+                    'enable' => true,
+                    'hasstatus' => false,
+                )
+    }
+    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -44,6 +63,15 @@ describe 'boundary', :type => 'class' do
     let(:params) { {:token => 'api-123456',} }
 
     it 'should compile' do should create_class('boundary') end
+    it { should contain_class('boundary::dependencies') }
+
+    it { should contain_service('boundary-meter').with(
+                    'ensure' => 'running',
+                    'enable' => true,
+                    'hasstatus' => false,
+                )
+    }
+    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -60,6 +88,15 @@ describe 'boundary', :type => 'class' do
     let(:params) { {:token => 'api-123456',} }
 
     it 'should compile' do should create_class('boundary') end
+    it { should contain_class('boundary::dependencies') }
+
+    it { should contain_service('boundary-meter').with(
+                    'ensure' => 'running',
+                    'enable' => true,
+                    'hasstatus' => false,
+                )
+    }
+    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
@@ -74,8 +111,18 @@ describe 'boundary', :type => 'class' do
       }
     end
     let(:params) { {:token => 'api-123456',} }
+    let(:fqdn) { 'testhost.example.com' }
 
     it 'should compile' do should create_class('boundary') end
+    it { should contain_class('boundary::dependencies') }
+
+    it { should contain_service('boundary-meter').with(
+                    'ensure' => 'running',
+                    'enable' => true,
+                    'hasstatus' => false,
+                )
+    }
+    it 'should compile' do should create_class('boundary::dependencies') end
 
   end
 
