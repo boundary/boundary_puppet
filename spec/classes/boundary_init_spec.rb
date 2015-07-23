@@ -23,6 +23,10 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
+    it { should contain_package('boundary-meter').with(
+                    'ensure' => 'present',
+                )
+    }
 
   end
 
@@ -46,6 +50,10 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
+    it { should contain_package('boundary-meter').with(
+                    'ensure' => 'present',
+                )
+    }
 
   end
 
@@ -67,6 +75,10 @@ describe 'boundary', :type => 'class' do
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
+                )
+    }
+    it { should contain_package('boundary-meter').with(
+                    'ensure' => 'present',
                 )
     }
 
@@ -93,6 +105,10 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
+    it { should contain_package('boundary-meter').with(
+                    'ensure' => 'present',
+                )
+    }
 
   end
 
@@ -116,6 +132,10 @@ describe 'boundary', :type => 'class' do
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
+                )
+    }
+    it { should contain_package('boundary-meter').with(
+                    'ensure' => 'present',
                 )
     }
 
