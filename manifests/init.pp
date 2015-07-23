@@ -20,17 +20,13 @@
 class boundary (
     $token,
     $tags = [],
+    $ensure = 'present',
     $release = 'production' ) {
 
   require boundary::dependencies
 
-  File {
-    group  => 'root',
-    owner  => 'root',
-  }
-
   package { 'boundary-meter':
-    ensure  => latest
+    ensure  => $ensure
   }
 
   boundary::resource::yaml { '/etc/boundary/boundary.yaml':
