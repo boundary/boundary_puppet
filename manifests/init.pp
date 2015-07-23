@@ -33,16 +33,16 @@ class boundary (
     ensure  => latest
   }
 
-  boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-    boundary_token => "${token}"
+  boundary::resource::yaml { '/etc/puppet/boundary.yaml':
+    boundary_token => $token
   }
 
   boundary_meter { $::fqdn:
     ensure  => present,
-    token  => $token,
+    token   => $token,
     tags    => $tags,
     require => Package['boundary-meter'],
-    notify => Service['boundary-meter'],
+    notify  => Service['boundary-meter'],
   }
 
   service { 'boundary-meter':

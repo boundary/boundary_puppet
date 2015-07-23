@@ -23,9 +23,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-define boundary::resource::boundary(
-    $ensure          = 'present',
-    $boundary_token
+define boundary::resource::yaml (
+  $boundary_token,
+  $ensure          = 'present',
   ) {
 
   File {
@@ -40,8 +40,8 @@ define boundary::resource::boundary(
     default  => file,
   }
 
-  file { "${name}":
-    ensure   => $ensure_real,
-    content  => template('boundary/boundary.yaml.erb')
+  file { $name:
+    ensure  => $ensure_real,
+    content => template('boundary/boundary.yaml.erb')
   }
 }

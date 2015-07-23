@@ -21,8 +21,8 @@
 class boundary::delete ($id, $token) {
 
   boundary_meter { $::fqdn:
-    ensure   => absent,
-    token   => $token,
+    ensure => absent,
+    token  => $token,
   }
 
   service { 'boundary-meter':
@@ -31,7 +31,7 @@ class boundary::delete ($id, $token) {
   }
 
   package { 'boundary-meter':
-    ensure => purged,
+    ensure  => purged,
     require => Service['boundary-meter']
   }
 }

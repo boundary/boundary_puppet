@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 class boundary::dependencies {
 
   $repo_mod = $boundary::release ? {
@@ -26,37 +25,49 @@ class boundary::dependencies {
     default     => '',
   }
 
-  case $::operatingsystem {
+  case $::osfamily {
+    'RedHat', 'CentOS', 'Scientific': {
+      $baseurl = "http://yum${repo_mod}.boundary.com/centos/os/${::operatingsystemrelease}/${::architecture}/"
+    }
+    'Fedora': {
+      $baseurl = "http://yum${repo_mod}.boundary.com/centos/os/6.4/${::architecture}/"
+    }
+    'Amazon': {
+      $baseurl = "http://yum${repo_mod}.boundary.com/centos/os/6.4/${::architecture}/"
+    }
+    default: {
+      #default to RHEL
+      $baseurl = "http://yum${repo_mod}.boundary.com/centos/os/${::operatingsystemrelease}/${::architecture}/"
+    }
+  }
+
+  case $::osfamily {
     'RedHat', 'redhat', 'CentOS', 'centos', 'Amazon', 'Fedora': {
 
       yumrepo { 'boundary':
-        descr    => "Boundary $::operatingsystemrelease $::architecture Repository ",
+        descr    => "Boundary ${::operatingsystemrelease} ${::architecture} Repository ",
         enabled  => 1,
-        baseurl  => $::operatingsystem ? {
-          /(RedHat|redhat|CentOS|centos)/ =>  "http://yum$repo_mod.boundary.com/centos/os/$::operatingsystemrelease/$::architecture/",
-          'Fedora'                        =>  "http://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
-          'Amazon'                        =>  "http://yum$repo_mod.boundary.com/centos/os/6.4/$::architecture/",
-        },
+        baseurl  => $baseurl,
         gpgcheck => 1,
-        gpgkey   => "http://yum$repo_mod.boundary.com/RPM-GPG-KEY-Boundary",
+        gpgkey   => "http://yum${repo_mod}.boundary.com/RPM-GPG-KEY-Boundary",
       }
     }
 
-    'debian', 'ubuntu': {
+    'Debian', 'Ubuntu': {
 
-      include apt
+      include ::apt
 
-      $repo = $::operatingsystem ? {
+      $repo = $::osfamily ? {
         debian    => 'main',
         ubuntu    => 'universe',
         default   => undef,
       }
 
       apt::source { 'boundary':
-        location   => inline_template('<%= "http://apt#{@repo_mod}.boundary.com/#{@operatingsystem.downcase}" %>'),
+        location   => inline_template('<%= "http://apt#{@repo_mod}.boundary.com/#{@osfamily.downcase}" %>'),
         repos      => $repo,
         key        => '6532CC20',
-        key_source => "http://apt$repo_mod.boundary.com/APT-GPG-KEY-Boundary"
+        key_source => "http://apt${repo_mod}.boundary.com/APT-GPG-KEY-Boundary"
       }
     }
 
