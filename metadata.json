@@ -3,7 +3,7 @@
   "version": "3.1.1",
   "author": "boundary",
   "summary": "Boundary meter module",
-  "license": "Apache 2.0",
+  "license": "Apache License 2.0",
   "source": "https://github.com/boundary/boundary_puppet",
   "operatingsystem_support": [
     {
