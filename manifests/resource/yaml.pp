@@ -29,10 +29,10 @@ define boundary::resource::yaml (
   ) {
 
   file { $title :
+    ensure  => $ensure,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    ensure => $ensure,
     content => template('boundary/boundary.yaml.erb')
   }
 
