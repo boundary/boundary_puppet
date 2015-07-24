@@ -17,38 +17,12 @@
 # limitations under the License.
 #
 
-class boundary (
-    $token,
-    $tags = [],
-    $release = 'production' ) {
+class boundary {
 
-  require boundary::dependencies
+  include boundary::install
+  include boundary::service
 
-  File {
-    group  => 'root',
-    owner  => 'root',
-  }
+  Class[boundary::install] ~>
+  Class[boundary::service]
 
-  package { 'boundary-meter':
-    ensure  => latest
-  }
-
-  boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-    boundary_token => "${token}"
-  }
-
-  boundary_meter { $::fqdn:
-    ensure  => present,
-    token  => $token,
-    tags    => $tags,
-    require => Package['boundary-meter'],
-    notify => Service['boundary-meter'],
-  }
-
-  service { 'boundary-meter':
-    ensure    => running,
-    enable    => true,
-    hasstatus => false,
-    require   => Boundary_meter[$::fqdn],
-  }
 }

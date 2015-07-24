@@ -1,13 +1,6 @@
 #
-# Author:: Rhommel Lamas <roml@rhommell.com>
+# Author:: James Turnbull <james@puppetlabs.com>
 # Module Name:: boundary
-# Class:: boundary::resource::boundary
-#
-# USAGE:
-#
-#   boundary::resource::boundary { '/etc/puppet/boundary.yaml':
-#     boundary_token => "${token}"
-#   }
 #
 # Copyright 2011, Puppet Labs
 #
@@ -23,25 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-define boundary::resource::boundary(
-    $ensure          = 'present',
-    $boundary_token
-  ) {
 
-  File {
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-  }
+class boundary::service (
+  $ensure = 'running'
+) {
 
-## Shared Variables
-  $ensure_real = $ensure ? {
-    'absent' => absent,
-    default  => file,
-  }
-
-  file { "${name}":
-    ensure   => $ensure_real,
-    content  => template('boundary/boundary.yaml.erb')
+  service { 'boundary-meter':
+    ensure    => $ensure,
+    enable    => true,
+    hasstatus => false,
+    require   => [Boundary_meter[$::fqdn], Package['boundary-meter']],
   }
 }

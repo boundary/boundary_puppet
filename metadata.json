@@ -1,50 +1,72 @@
 {
   "name": "boundary-boundary",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": "boundary",
   "summary": "Boundary meter module",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "source": "https://github.com/boundary/boundary_puppet",
-  "types": [
+  "requirements": [
     {
-      "providers": [
-        {
-          "name": "boundary_meter",
-          "doc": "Manage Boundary meters.    Default for `kernel` == `Linux`.  "
-        },
-        {
-          "name": "default",
-          "doc": "This is a default provider that does nothing. This allows us to install the Boundary meter on the same puppet run where we want to use it.    "
-        }
-      ],
-      "name": "boundary_meter",
-      "doc": "Manage creation/deletion of Boundary meters.",
-      "parameters": [
-        {
-          "name": "meter",
-          "doc": "The Boundary meter name"
-        },
-        {
-          "name": "tokens",
-          "doc": "Boundary meter installation tokens."
-        },
-        {
-          "name": "token",
-          "doc": "Boundary Installation Token (this can be a comma-separated array of tokens for Enterprise and Premium)."
-        }
-      ],
-      "properties": [
-        {
-          "name": "ensure",
-          "doc": "The basic property that the resource should be in.  Valid values are `present`, `absent`."
-        }
-      ]
+      "name": "pe",
+      "version_requirement": ">= 3.7.0 < 4.0.0"
+    },
+    {
+      "name": "puppet",
+      "version_requirement": "3.x"
     }
   ],
   "issues_url": "https://github.com/boundary/boundary_puppet/issues",
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "OracleLinux",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "Scientific",
+      "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "6",
+        "7",
+        "8"
+      ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "12.04",
+        "14.04"
+      ]
+    }
+  ],
   "description": "A module to install Boundary meters.",
   "project_page": "https://github.com/boundary/boundary_puppet",
   "dependencies": [
-
+    { "name":"puppetlabs/stdlib", "version_requirement":">= 2.4.0 < 5.0.0" }
   ]
 }
