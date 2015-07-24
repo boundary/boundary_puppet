@@ -57,8 +57,6 @@ class boundary::install (
 
     'Debian', 'Ubuntu': {
 
-      include ::apt
-
       $repo = $::osfamily ? {
         debian    => 'main',
         ubuntu    => 'universe',
