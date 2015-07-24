@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'rspec-puppet'
 
-describe 'boundary::install', :type => 'class' do
+describe 'boundary::meter', :type => 'class' do
 
   context "On Debian OS with no package name specified" do
     let :facts do
@@ -12,14 +12,13 @@ describe 'boundary::install', :type => 'class' do
           :lsbdistcodename => 'jessie'
       }
     end
-
-    it 'should compile' do should create_class('boundary::install') end
-
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
+    let(:params) {
+      {
+          :token => 'api-123456',
+          :ensure => 'present'
+      }
     }
-
+    let(:fqdn) { 'testhost.example.com' }
 
   end
 
@@ -32,13 +31,13 @@ describe 'boundary::install', :type => 'class' do
           :lsbdistcodename => 'precise'
       }
     end
-
-    it 'should compile' do should create_class('boundary::install') end
-
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
+    let(:params) {
+      {
+          :token => 'api-123456',
+          :ensure => 'present'
+      }
     }
+    let(:fqdn) { 'testhost.example.com' }
 
   end
 
@@ -51,13 +50,8 @@ describe 'boundary::install', :type => 'class' do
           :lsbdistcodename => 'trusty'
       }
     end
-
-    it 'should compile' do should create_class('boundary::install') end
-
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
-    }
+    let(:params) { {:token => 'api-123456', :ensure => 'present'} }
+    let(:fqdn) { 'testhost.example.com' }
 
   end
 
@@ -71,13 +65,13 @@ describe 'boundary::install', :type => 'class' do
           :architecture => 'x86_64'
       }
     end
-
-    it 'should compile' do should create_class('boundary::install') end
-
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
+    let(:params) {
+      {
+          :token => 'api-123456',
+          :ensure => 'present'
+      }
     }
+    let(:fqdn) { 'testhost.example.com' }
 
   end
 
@@ -91,13 +85,13 @@ describe 'boundary::install', :type => 'class' do
           :architecture => 'x86_64'
       }
     end
-
-    it 'should compile' do should create_class('boundary::install') end
-
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
+    let(:params) {
+      {
+          :token => 'api-123456',
+          :ensure => 'present'
+      }
     }
+    let(:fqdn) { 'testhost.example.com' }
 
   end
 
