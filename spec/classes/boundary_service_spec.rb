@@ -14,9 +14,7 @@ describe 'boundary', :type => 'class' do
     end
     let(:params) { {:token => 'api-123456',} }
 
-    it 'should compile' do should create_class('boundary') end
-    it { should contain_class('boundary::install') }
-    it { should contain_class('boundary::service') }
+    it 'should compile' do should create_class('boundary::service') end
 
     it { should contain_service('boundary-meter').with(
                     'ensure' => 'running',
@@ -24,10 +22,7 @@ describe 'boundary', :type => 'class' do
                     'hasstatus' => false,
                 )
     }
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
-                )
-    }
+
 
   end
 
@@ -42,18 +37,12 @@ describe 'boundary', :type => 'class' do
     end
     let(:params) { {:token => 'api-123456',} }
 
-    it 'should compile' do should create_class('boundary') end
-    it { should contain_class('boundary::install') }
-    it { should contain_class('boundary::service') }
+    it 'should compile' do should create_class('boundary::service') end
 
     it { should contain_service('boundary-meter').with(
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
-                )
-    }
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
                 )
     }
 
@@ -70,18 +59,12 @@ describe 'boundary', :type => 'class' do
     end
     let(:params) { {:token => 'api-123456',} }
 
-    it 'should compile' do should create_class('boundary') end
-    it { should contain_class('boundary::install') }
-    it { should contain_class('boundary::service') }
+    it 'should compile' do should create_class('boundary::service') end
 
     it { should contain_service('boundary-meter').with(
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
-                )
-    }
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
                 )
     }
 
@@ -99,18 +82,12 @@ describe 'boundary', :type => 'class' do
     end
     let(:params) { {:token => 'api-123456',} }
 
-    it 'should compile' do should create_class('boundary') end
-    it { should contain_class('boundary::install') }
-    it { should contain_class('boundary::service') }
+    it 'should compile' do should create_class('boundary::service') end
 
     it { should contain_service('boundary-meter').with(
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
-                )
-    }
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
                 )
     }
 
@@ -129,18 +106,12 @@ describe 'boundary', :type => 'class' do
     let(:params) { {:token => 'api-123456',} }
     let(:fqdn) { 'testhost.example.com' }
 
-    it 'should compile' do should create_class('boundary') end
-    it { should contain_class('boundary::install') }
-    it { should contain_class('boundary::service') }
+    it 'should compile' do should create_class('boundary::service') end
 
     it { should contain_service('boundary-meter').with(
                     'ensure' => 'running',
                     'enable' => true,
                     'hasstatus' => false,
-                )
-    }
-    it { should contain_package('boundary-meter').with(
-                    'ensure' => 'present',
                 )
     }
 
