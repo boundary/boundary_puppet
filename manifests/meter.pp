@@ -2,11 +2,14 @@
 define boundary::meter (
   $ensure,
   $token,
-  $meter = $::fqdn,
   $tags = []
 
 ) {
 
-  boundary_meter ( $meter, $ensure, $token, $tags )
+  boundary_meter { $name:
+    ensure => $ensure,
+    token => $token,
+    tags => $tags
+}
 
 }
