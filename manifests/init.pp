@@ -17,11 +17,7 @@
 # limitations under the License.
 #
 
-class boundary (
-    $token,
-    $tags = [],
-    $ensure = 'present',
-    $release = 'production' ) {
+class boundary {
 
   include boundary::install
   include boundary::service
