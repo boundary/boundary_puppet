@@ -21,9 +21,8 @@
 Puppet::Type.type(:meter).provide(:boundary) do
   @doc = 'Manages the creation of boundary meters'
 
-  conf_dir = '/etc/boundary',
+  conf_dir = '/etc/boundary'
 
-      initvars
   defaultfor :kernel => 'Linux'
 
   def create
@@ -57,7 +56,7 @@ Puppet::Type.type(:meter).provide(:boundary) do
 
   def self.create_meter(resource)
     begin
-      self.run_command(build_command(resource, :create, conf_dir))
+      self.run_command(build_command(resource, :create))
     rescue Exception => e
       raise Puppet::Error, "Could not create meter, failed with #{e}"
     end
@@ -65,7 +64,7 @@ Puppet::Type.type(:meter).provide(:boundary) do
 
   def self.delete_meter(resource)
     begin
-      self.run_command(build_command(resource, :delete, conf_dir))
+      self.run_command(build_command(resource, :delete))
     rescue Exception => e
       raise Puppet::Error, "Could not delete meter, failed with #{e}"
     end
@@ -82,7 +81,7 @@ Puppet::Type.type(:meter).provide(:boundary) do
   def  self.set_meter_tags(resource)
     begin
       # Remove all tags
-      run_command(build_command(resource, :delete_tags, conf_dir))
+      run_command(build_command(resource, :delete_tags))
       # Add new tags
       run_command(build_command(resource, nil, conf_dir))
     rescue Exception => e
@@ -101,11 +100,11 @@ Puppet::Type.type(:meter).provide(:boundary) do
 
   # Internal Methods
 
-  def self.build_command(resource, action, conf_dir)
+  def self.build_command(resource, action)
     command = [
         'boundary-meter',
         "-p #{resource[:token]}",
-        "-b  #{conf_dir}",
+        "-b  #{self.conf_dir}",
     ]
 
     command.push "-l #{action.to_s}" unless action == nil
