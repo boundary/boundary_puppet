@@ -1,7 +1,6 @@
 #
-# Author:: James Turnbull <james@lovedthanlost.net>
+# Author:: James Turnbull <james@puppetlabs.com>
 # Module Name:: boundary
-# Class:: boundary::delete
 #
 # Copyright 2011, Puppet Labs
 #
@@ -18,20 +17,14 @@
 # limitations under the License.
 #
 
-class boundary::delete ($id, $token) {
-
-  boundary_meter { $::fqdn:
-    ensure => absent,
-    token  => $token,
-  }
+class boundary::service (
+  $ensure = 'running'
+) {
 
   service { 'boundary-meter':
-    ensure => stopped,
-    enable => false,
-  }
-
-  package { 'boundary-meter':
-    ensure  => purged,
-    require => Service['boundary-meter']
+    ensure    => $ensure,
+    enable    => true,
+    hasstatus => false,
+    require   => [Boundary_meter[$::fqdn], Package['boundary-meter']],
   }
 }

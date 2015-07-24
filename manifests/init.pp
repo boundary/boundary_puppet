@@ -23,28 +23,10 @@ class boundary (
     $ensure = 'present',
     $release = 'production' ) {
 
-  require boundary::dependencies
+  include boundary::install
+  include boundary::service
 
-  package { 'boundary-meter':
-    ensure  => $ensure
-  }
+  Class[boundary::install] ~>
+  Class[boundary::service]
 
-  boundary::resource::yaml { '/etc/boundary/boundary.yaml':
-    boundary_token => $token
-  }
-
-  boundary_meter { $::fqdn:
-    ensure  => present,
-    token   => $token,
-    tags    => $tags,
-    require => Package['boundary-meter'],
-    notify  => Service['boundary-meter'],
-  }
-
-  service { 'boundary-meter':
-    ensure    => running,
-    enable    => true,
-    hasstatus => false,
-    require   => Boundary_meter[$::fqdn],
-  }
 }
